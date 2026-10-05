@@ -1,4 +1,4 @@
-const V="boekenkast-v9";
+const V="boekenkast-v10";
 const CORE=["./","index.html","manifest.json","icon-192.png","icon-512.png","https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js","https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).catch(()=>{}).then(()=>self.skipWaiting()))});
 /* remove all old caches, including earlier cover caches */
