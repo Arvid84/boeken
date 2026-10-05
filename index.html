@@ -80,7 +80,7 @@ h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-item
 .empty{color:var(--fg2);text-align:center;padding:28px 20px;background:var(--card);border-radius:22px}
 /* covers */
 .cover{aspect-ratio:2/3;border-radius:10px;overflow:hidden;position:relative;background:var(--card2);box-shadow:0 2px 10px rgba(0,0,0,.18);max-width:100%}
-.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;display:block;background:var(--card2)}
 .cover .ph{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:10% 9%;color:#fff;font-weight:700;line-height:1.15}
 .cover .ph .pt{font-size:clamp(11px,3.3vw,16px);overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;font-family:Georgia,"Times New Roman",serif}
 .cover .ph .pa{font-size:clamp(9px,2.4vw,12px);font-weight:500;opacity:.85}
@@ -349,7 +349,7 @@ const PALS=[["#5b3a8c","#2b1b47"],["#1f5f8b","#0e2c42"],["#8b2f3c","#3f141b"],["
 function hash(s){let h=0;for(const c of s||"")h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)}
 function coverHTML(b,cls=""){const p=PALS[hash(b.title)%PALS.length];
   const ph=`<div class="ph" style="background:linear-gradient(160deg,${p[0]},${p[1]})"><div class="pt">${esc(b.title||t("noTitle"))}</div><div class="pa">${esc(b.author)}</div></div>`;
-  const img=b.cover?`<img src="${esc(b.cover)}" alt="" loading="lazy" onerror="this.remove()">`:"";
+  const img=b.cover?`<img src="${esc(b.cover)}" alt="" loading="lazy" onerror="this.remove()" onload="if(this.naturalWidth<10)this.remove()">`:"";
   return `<div class="cover ${cls}">${ph}${img}</div>`}
 function bgStyle(b){return b.cover?`style="background-image:url('${esc(b.cover).replace(/'/g,"%27")}')"`:`style="background:linear-gradient(160deg,${PALS[hash(b.title)%PALS.length].join(",")})"`}
 
@@ -476,7 +476,7 @@ function vSettings(){const st=S.settings;
    ${window.SEED_CSV?`<button class="row accent" data-a="seed">${t("loadSeed")}</button>`:""}
    <button class="row" style="color:var(--red)" data-a="deleteall">${t("deleteAll")}</button></div>
   <p class="hint">${t("install")}</p>
-  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.3</p>`}
+  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.4</p>`}
 
 /* ---------- render ---------- */
 function render(){const c=cur();let h="";
@@ -762,6 +762,7 @@ document.addEventListener("keydown",e=>{const el=e.target.closest&&e.target.clos
   try{const st=await DB.get("settings");if(st)Object.assign(S.settings,st)}catch(e){}
   applySettings();render();
   try{S.session=await DB.get("session")||null;if(S.session&&byId(S.session.bookId))showReader()}catch(e){}
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   setTimeout(()=>fetchMissingCovers(),1500);
   if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 })();
