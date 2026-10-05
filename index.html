@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px)}[hidden]{display:none!important}</style>
+<title>Boekenkast</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Boekenkast">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-512.png">
+<style>
+/* Layout: iOS-native stack navigation — large titles, grouped inset lists, floating glass tab bar */
+:root{
+  --bg:#f2f2f7; --card:#ffffff; --card2:#e9e9ee; --fg:#000; --fg2:rgba(60,60,67,.62); --fg3:rgba(60,60,67,.32);
+  --sep:rgba(60,60,67,.18); --accent:#007aff; --green:#34c759; --red:#ff3b30; --gold:#c79a3b;
+  --glass:rgba(250,250,252,.72); --glass-b:rgba(0,0,0,.08); --shadow:0 8px 30px rgba(0,0,0,.12);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --round:-apple-system-ui-rounded,ui-rounded,"SF Pro Rounded",var(--font);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --fg:#fff; --fg2:rgba(235,235,245,.62); --fg3:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.6); --accent:#0a84ff; --green:#30d158; --red:#ff453a; --gold:#d6ad55;
+  --glass:rgba(40,40,44,.62); --glass-b:rgba(255,255,255,.1); --shadow:0 8px 30px rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --fg:#fff; --fg2:rgba(235,235,245,.62); --fg3:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.6); --accent:#0a84ff; --green:#30d158; --red:#ff453a; --gold:#d6ad55;
+  --glass:rgba(40,40,44,.62); --glass-b:rgba(255,255,255,.1); --shadow:0 8px 30px rgba(0,0,0,.5); color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.35 var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--fg)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:8px 140px}
+/* top bar */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:10px;padding-block:6px;margin-inline:-4px}
+.topbar .sp{flex:1}
+.pill{height:44px;min-width:44px;padding:0 16px;border-radius:22px;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  background:var(--glass);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);border:.5px solid var(--glass-b);font-weight:500}
+.pill.icon{padding:0;width:44px}
+.pill svg{width:22px;height:22px}
+.pill.gold{color:var(--gold);font-weight:600}
+h1.large{font-size:34px;font-weight:700;letter-spacing:.2px;margin:6px 0 14px;text-wrap:balance}
+h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-items:center;justify-content:space-between}
+.cap{font-size:13px;letter-spacing:.4px;text-transform:uppercase;color:var(--fg2);margin:24px 16px 8px}
+/* grouped list */
+.group{background:var(--card);border-radius:22px;overflow:hidden}
+.row{display:flex;align-items:center;gap:14px;min-height:52px;padding:8px 16px;width:100%;text-align:left;position:relative}
+.row+.row::before{content:"";position:absolute;top:0;right:0;left:var(--inset,16px);border-top:.5px solid var(--sep)}
+.row .ico{width:44px;height:44px;border-radius:12px;background:var(--card2);display:grid;place-items:center;flex:none}
+.row .ico svg{width:22px;height:22px}
+.row .lbl{flex:1;min-width:0}
+.row .val{color:var(--fg2);font-variant-numeric:tabular-nums;text-align:right;min-width:0;overflow-wrap:anywhere}
+.row .chev{color:var(--fg3);width:14px;height:14px;flex:none}
+.row.big{min-height:64px}
+.row input,.row select,.row textarea{flex:1;min-width:0;border:0;background:transparent;text-align:right;outline:none;padding:6px 0}
+.row textarea{text-align:left;resize:vertical;min-height:70px}
+.row.danger{color:var(--red);justify-content:center}
+.row.accent{color:var(--accent)}
+/* now reading */
+.carousel{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-16px;padding-inline:16px;padding-block:4px 10px;scrollbar-width:none}
+.carousel::-webkit-scrollbar{display:none}
+.nowcard{scroll-snap-align:start;flex:0 0 calc(100% - 28px);border-radius:28px;position:relative;overflow:hidden;display:flex;gap:16px;align-items:center;padding:16px;color:#fff;min-height:150px;text-align:left}
+.nowcard .bgimg{position:absolute;inset:-30px;background-size:cover;background-position:center;filter:blur(30px) saturate(1.4) brightness(.75);transform:scale(1.2)}
+.nowcard>*:not(.bgimg){position:relative}
+.nowcard .cov{width:76px;flex:none}
+.nowcard .meta{flex:1;min-width:0}
+.nowcard .t{font-weight:700;font-size:18px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nowcard .a{opacity:.85;font-size:15px;margin-top:2px}
+.prog{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:15px;font-variant-numeric:tabular-nums}
+.bar{height:4px;border-radius:2px;background:rgba(255,255,255,.35);flex:0 0 70px;overflow:hidden}
+.bar i{display:block;height:100%;background:#fff}
+.play{width:54px;height:54px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;flex:none}
+.play svg{width:22px;height:22px}
+.empty{color:var(--fg2);text-align:center;padding:28px 20px;background:var(--card);border-radius:22px}
+/* covers */
+.cover{aspect-ratio:2/3;border-radius:10px;overflow:hidden;position:relative;background:var(--card2);box-shadow:0 2px 10px rgba(0,0,0,.18);max-width:100%}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover .ph{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:10% 9%;color:#fff;font-weight:700;line-height:1.15}
+.cover .ph .pt{font-size:clamp(11px,3.3vw,16px);overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;font-family:Georgia,"Times New Roman",serif}
+.cover .ph .pa{font-size:clamp(9px,2.4vw,12px);font-weight:500;opacity:.85}
+.badge{position:absolute;right:6px;bottom:6px;width:28px;height:28px;border-radius:50%;background:rgba(30,30,30,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;color:#fff}
+.badge svg{width:15px;height:15px}
+.badge.fav{left:6px;right:auto;color:#ff6482}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 12px}
+@media (min-width:560px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.grid button{text-align:left;min-width:0}
+.grid .gt{font-size:13px;margin-top:6px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin:2px 0 12px;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--fg2);font-weight:600;gap:10px}
+.toolbar button{color:var(--fg);font-weight:600;letter-spacing:.5px;display:flex;gap:6px;align-items:center}
+.search{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:12px;padding:0 12px;height:40px;margin-bottom:14px}
+.search input{flex:1;border:0;background:transparent;outline:none;min-width:0}
+.search svg{width:18px;height:18px;color:var(--fg2);flex:none}
+/* detail */
+.hero{position:relative;margin:-8px -16px 0;padding:calc(env(safe-area-inset-top,0px) + 70px) 16px 26px;text-align:center;overflow:hidden;color:#fff}
+.hero .bgimg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(40px) saturate(1.3) brightness(.8);transform:scale(1.3)}
+.hero>*:not(.bgimg){position:relative}
+.hero .cover{width:46%;max-width:220px;margin:0 auto;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.hero h1{font-size:25px;line-height:1.2;margin:20px 0 6px;text-wrap:balance}
+.hero .au{opacity:.85;font-size:18px}
+.pagechip{position:absolute;right:8px;bottom:8px;background:rgba(60,60,60,.75);color:#fff;font-size:13px;padding:4px 10px;border-radius:12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.actions{display:flex;justify-content:center;gap:30px;margin-top:22px}
+.act{display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:600;font-size:15px;color:#fff}
+.act span.c{width:66px;height:66px;border-radius:50%;background:rgba(255,255,255,.25);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center}
+.act.primary span.c{background:#fff;color:#000}
+.act svg{width:26px;height:26px}
+.hero .back{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:12px;color:#fff;background:rgba(255,255,255,.22)}
+.hero .more{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;color:#fff;background:rgba(255,255,255,.22)}
+.progcard{background:var(--card);border-radius:22px;padding:18px;display:flex;align-items:center;gap:16px}
+.progcard .pc{flex:1;min-width:0}
+.progcard .big{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.progcard .sub{color:var(--fg2);font-size:15px;margin-top:2px}
+.ring{width:72px;height:72px;flex:none}
+.stars{display:flex;gap:4px}
+.stars button svg{width:24px;height:24px}
+.stars .on{color:#ff9f0a}.stars .off{color:var(--fg3)}
+/* tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 10px);display:flex;gap:12px;justify-content:center;pointer-events:none}
+.tabs,.fab{pointer-events:auto;background:var(--glass);backdrop-filter:blur(24px) saturate(1.7);-webkit-backdrop-filter:blur(24px) saturate(1.7);border:.5px solid var(--glass-b);box-shadow:var(--shadow)}
+.tabs{display:flex;border-radius:34px;padding:5px;flex:1;max-width:460px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border-radius:28px;font-size:11px;font-weight:600;color:var(--fg)}
+.tab svg{width:26px;height:26px}
+.tab.on{background:var(--card2);color:var(--accent)}
+.fab{width:62px;height:62px;border-radius:50%;display:grid;place-items:center}
+.fab svg{width:26px;height:26px}
+/* sheets & modals */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.sheet{background:var(--bg);width:100%;max-width:640px;border-radius:28px 28px 0 0;padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 20px);max-height:92vh;overflow:auto;animation:up .28s cubic-bezier(.2,.9,.3,1)}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--fg3);margin:0 auto 12px}
+.sheet h3{text-align:center;margin:4px 0 14px;font-size:17px}
+.sheet .btnrow{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;height:52px;border-radius:26px;background:var(--card2);font-weight:600}
+.btn.primary{background:var(--fg);color:var(--bg)}
+.btn.blue{background:var(--accent);color:#fff}
+.btn.red{color:var(--red)}
+@keyframes up{from{transform:translateY(100%)}}
+@keyframes fade{from{opacity:0}}
+@media (prefers-reduced-motion:reduce){.sheet,.scrim{animation:none}}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:80;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:.5px solid var(--glass-b);box-shadow:var(--shadow);padding:10px 18px;border-radius:22px;font-weight:600;font-size:15px;max-width:calc(100% - 32px);text-align:center}
+/* reading mode */
+.reader{position:fixed;inset:0;z-index:60;color:#fff;display:flex;flex-direction:column;align-items:center;overflow:hidden;background:#222}
+.reader .bgimg{position:absolute;inset:-60px;background-size:cover;background-position:center;filter:blur(50px) saturate(1.3) brightness(.7);transform:scale(1.3)}
+.reader>*:not(.bgimg){position:relative}
+.reader .top{width:100%;display:flex;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 0}
+.reader .top .pill{color:#fff;background:rgba(255,255,255,.2)}
+.reader .cover{width:min(52vw,250px);margin-top:6vh;border-radius:18px}
+.reader .goal{margin-top:5vh;display:flex;align-items:center;gap:10px;font-size:22px;font-weight:600}
+.reader .goal svg{width:28px;height:28px}
+.reader .time{font:200 min(24vw,110px)/1 var(--round);font-variant-numeric:tabular-nums;margin-top:8px;letter-spacing:-1px}
+.reader .ctrls{display:flex;gap:36px;margin-top:auto;margin-bottom:calc(env(safe-area-inset-bottom,0px) + 40px)}
+.reader .ctrls .act span.c{width:84px;height:84px}
+.reader .ctrls .act svg{width:32px;height:32px}
+/* scanner */
+.scanner{position:fixed;inset:0;z-index:60;background:#000;color:#fff;display:flex;flex-direction:column}
+.scanner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.scanner .frame{position:absolute;left:12%;right:12%;top:34%;height:18%;border:3px solid rgba(255,255,255,.9);border-radius:22px;box-shadow:0 0 0 2000px rgba(0,0,0,.25)}
+.scanner .top{position:relative;display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px}
+.scanner .top .pill{color:#fff;background:rgba(255,255,255,.2)}
+.scanner .panel{position:relative;margin-top:auto;background:var(--bg);color:var(--fg);border-radius:28px 28px 0 0;padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 16px);max-height:48vh;overflow:auto}
+.scanned{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:.5px solid var(--sep)}
+.scanned .cover{width:44px;flex:none;border-radius:6px}
+.scanned .m{flex:1;min-width:0;font-size:15px}
+.scanned .m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dup{color:var(--red);font-size:13px;font-weight:600}
+.okc{color:var(--green);font-size:13px;font-weight:600}
+/* cover search */
+.cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cgrid button{position:relative}
+.cgrid .src{font-size:11px;color:var(--fg2);margin-top:4px;text-align:center}
+.paste{border:1.5px dashed var(--fg3);border-radius:18px;padding:18px;text-align:center;color:var(--fg2);margin-top:12px;outline:none}
+.paste:focus{border-color:var(--accent)}
+.hint{color:var(--fg2);font-size:13px;margin:8px 16px 0;line-height:1.4}
+/* stats */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{background:var(--card);border-radius:22px;padding:16px}
+.tile .n{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;font-family:var(--round)}
+.tile .l{color:var(--fg2);font-size:14px}
+.chart{background:var(--card);border-radius:22px;padding:16px}
+.chart svg{width:100%;height:auto;display:block}
+.seg{display:flex;background:var(--card2);border-radius:10px;padding:2px}
+.seg button{flex:1;padding:6px 8px;border-radius:8px;font-size:14px;font-weight:600}
+.seg button.on{background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.chip{background:var(--card2);border-radius:14px;padding:3px 10px;font-size:14px}
+.note{padding:12px 16px}
+.note+.note{border-top:.5px solid var(--sep)}
+.note small{color:var(--fg2);display:block;margin-bottom:2px}
+.spinner{width:28px;height:28px;border:3px solid var(--fg3);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:24px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result{display:flex;gap:12px;align-items:center;padding:10px 16px;width:100%;text-align:left}
+.result+.result{border-top:.5px solid var(--sep)}
+.result .cover{width:46px;flex:none;border-radius:6px}
+.result .m{flex:1;min-width:0}
+.result .m b{display:block;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.result .m span{color:var(--fg2);font-size:14px}
+.field{display:flex;gap:8px;margin-bottom:12px}
+.field input{flex:1;min-width:0;height:44px;border-radius:12px;border:0;background:var(--card2);padding:0 14px;outline:none}
+.field .btn{flex:none;height:44px;padding:0 18px}
+</style>
+</head>
+<body>
+
+
+<div id="app"></div>
+<div id="layer"></div>
+
+<script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+"use strict";
+/* ---------- icons ---------- */
+const I={
+ books:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="4" height="16" rx="1"/><rect x="8.5" y="4" width="4" height="16" rx="1"/><path d="M14.2 5.2l3.4-.9a1 1 0 011.2.7l3.4 13.2a1 1 0 01-.7 1.2l-3.4.9a1 1 0 01-1.2-.7L13.5 6.4a1 1 0 01.7-1.2z"/></svg>',
+ heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.3 3.1 4.5 6.9 4.5c2.2 0 3.6 1.2 5.1 3 1.5-1.8 2.9-3 5.1-3 3.8 0 6 3.8 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>',
+ fwd:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 4l8 7-8 7v-4.2C8.4 13.8 5 15.6 2 20c.8-6.3 4.6-10.6 12-11.6V4z"/></svg>',
+ open:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 5.5C4.6 4.3 8 4.2 11 5.8V20c-3-1.5-6.4-1.4-9-.3V5.5zM22 5.5c-2.6-1.2-6-1.3-9 .3V20c3-1.5 6.4-1.4 9-.3V5.5z"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg>',
+ star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>',
+ chev:'<svg viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l6 6-6 6"/></svg>',
+ back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l-8 8 8 8"/></svg>',
+ plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>',
+ search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>',
+ more:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+ play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 001.5.9l12-7.5a1 1 0 000-1.8l-12-7.5A1 1 0 007 4.5z"/></svg>',
+ pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="4" width="4.5" height="16" rx="1.2"/><rect x="14" y="4" width="4.5" height="16" rx="1.2"/></svg>',
+ close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+ stats:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4v16h18"/><path d="M6.5 15l4-4.5 3.5 3 6-7"/><path d="M16 6.5h4v4"/></svg>',
+ gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>',
+ barcode:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="4" width="2" height="16"/><rect x="5.5" y="4" width="1" height="16"/><rect x="8" y="4" width="2.5" height="16"/><rect x="12" y="4" width="1" height="16"/><rect x="14.5" y="4" width="2" height="16"/><rect x="18" y="4" width="1" height="16"/><rect x="20.5" y="4" width="1.5" height="16"/></svg>',
+ globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>',
+ pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16v4z"/></svg>',
+ timer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></svg>',
+ music:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 3v12.5a3 3 0 11-2-2.8V7.3L10 9v8.5a3 3 0 11-2-2.8V5.6L20 3z"/></svg>',
+ note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+ photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>',
+ sort:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M3.5 7.5L7 4l3.5 3.5M17 20V4M13.5 16.5L17 20l3.5-3.5"/></svg>',
+};
+
+/* ---------- i18n ---------- */
+const STR={
+nl:{library:"Boekenplank",nowReading:"Leest nu",collection:"Bibliotheek",all:"Alle boeken",wishlist:"Verlanglijst",toread:"Te lezen",reading:"Lezen",finished:"Voltooid",favorites:"Favorieten",owned:"Bibliotheek",abandoned:"Verlaten",more:"Meer",collections:"Collecties",collectionsPh:"bijv. In bestelling",importedU:"{n} nieuw, {u} bijgewerkt",importErr:"Dit bestand kon niet gelezen worden. Kies de Bookshelf-zip of de Books-CSV.",books:"Boeken",stats:"Statistieken",settings:"Instellingen",books_n:"boeken",sort:"Sorteren",s_added:"Recent toegevoegd",s_title:"Titel",s_author:"Auteur",s_year:"Jaar van uitgave",searchLib:"Zoek op titel, auteur of ISBN",readMode:"Leesmodus",status:"Status",edit:"Bewerken",progress:"Voortgang",pagesRead:"{a} van {b} pagina's gelezen",noPages:"Geen paginatelling bekend",updatePage:"Pagina bijwerken",details:"Details",isbn:"ISBN",publisher:"Uitgever",year:"Jaar",pages:"Pagina's",format:"Formaat",ownership:"Eigendom",categories:"Categorieën",added:"Toegevoegd",started:"Gestart",ended:"Voltooid op",rating:"Beoordeling",favorite:"Favoriet",notes:"Notities",noNotes:"Nog geen notities",addNote:"Notitie toevoegen",sessions:"Leessessies",deleteBook:"Verwijder boek",confirmDelete:"Dit boek verwijderen?",delete:"Verwijderen",cancel:"Annuleren",save:"Bewaren",title:"Titel",author:"Auteur",cover:"Cover",findCover:"Zoek cover online",addBook:"Boek toevoegen",scan:"Scan barcode",scanSub:"Scan één of meerdere barcodes",searchOnline:"Zoek online",searchOnlineSub:"Op titel, auteur of ISBN",manual:"Handmatig invoeren",manualSub:"Zelf alle gegevens invullen",newBook:"Nieuw boek",hardcover:"Hardcover",paperback:"Paperback",ebook:"E-book",audiobook:"Luisterboek",owned:"In bezit",notOwned:"Niet in bezit",borrowed:"Geleend",scanned:"Gescande boeken",scanHint:"Richt de camera op de barcode op de achterkant",alreadyHave:"Al in je bibliotheek",willAdd:"Nieuw",notFound:"Niet gevonden, wordt toegevoegd met alleen ISBN",addN:"Toevoegen ({n})",cameraErr:"Camera niet beschikbaar. Geef toegang in Instellingen > Safari > Camera.",goal:"{n}m tot doel",goalDone:"Dagdoel gehaald",pause:"Pauze",resume:"Hervat",finish:"Voltooien",untilPage:"Tot welke pagina heb je gelezen?",markFinished:"Markeer als voltooid?",yes:"Ja",no:"Nee",playlist:"Playlist",openPlaylist:"Open playlist",coverSearch:"Cover zoeken",googleImages:"Zoek op Google Afbeeldingen",pasteHint:"Houd een afbeelding ingedrukt in Safari, kies 'Kopieer' en tik hier op 'Plak'",pasteHere:"Tik hier en kies Plak",choosePhoto:"Kies foto of maak foto",noResults:"Geen resultaten",coverSaved:"Cover opgeslagen",removeCover:"Cover verwijderen",language:"Taal",auto:"Automatisch",dailyGoal:"Dagdoel lezen (minuten)",playlistUrl:"Playlist-link (Spotify of Apple Music)",playlistHint:"Plak de deel-link van een playlist. Bij het starten van de leesmodus kun je die met één tik openen.",appearance:"Weergave",system:"Systeem",light:"Licht",dark:"Donker",data:"Gegevens",importCsv:"Importeer Bookshelf-export (zip of CSV)",exportJson:"Maak back-up (JSON)",importJson:"Zet back-up terug",deleteAll:"Wis alle gegevens",confirmDeleteAll:"Alle boeken en sessies wissen? Dit kan niet ongedaan worden.",imported:"{n} boeken geïmporteerd, {d} dubbel overgeslagen",emptyLib:"Je bibliotheek is nog leeg",emptyHint:"Importeer je Bookshelf-export of voeg je eerste boek toe.",loadSeed:"Laad mijn export (mrt 2026)",nothingReading:"Je leest nu niets. Open een boek en tik op Leesmodus.",yearBooks:"Boeken voltooid in {y}",yearPages:"Pagina's gelezen in {y}",totalTime:"Totale leestijd",streak:"Leesreeks (dagen)",last7:"Leestijd afgelopen 7 dagen",perMonth:"Voltooid per maand in {y}",min:"min",saved:"Opgeslagen",progressSaved:"Voortgang opgeslagen",backupMade:"Back-up gemaakt",lookup:"Opzoeken…",searchBtn:"Zoek",noTitle:"Zonder titel",unknownAuthor:"Onbekende auteur",sessionSaved:"Sessie van {m} min opgeslagen",install:"Zet op beginscherm: tik op Deel en kies 'Zet op beginscherm'.",duplicateWarn:"Je hebt dit boek al",openExisting:"Open bestaande",addAnyway:"Toch toevoegen",notePh:"Schrijf je notitie…",page:"Pagina",fromPage:"Vanaf pagina {n}",about:"Over",version:"Versie"},
+en:{library:"Bookshelf",nowReading:"Now Reading",collection:"Library",all:"All Books",wishlist:"Wishlist",toread:"To Read",reading:"Reading",finished:"Finished",favorites:"Favorites",owned:"Library",abandoned:"Abandoned",more:"More",collections:"Collections",collectionsPh:"e.g. On order",importedU:"{n} new, {u} updated",importErr:"This file could not be read. Choose the Bookshelf zip or the Books CSV.",books:"Books",stats:"Statistics",settings:"Settings",books_n:"books",sort:"Sort",s_added:"Recently added",s_title:"Title",s_author:"Author",s_year:"Publication year",searchLib:"Search title, author or ISBN",readMode:"Reading Mode",status:"Status",edit:"Edit",progress:"Progress",pagesRead:"{a} of {b} pages read",noPages:"Page count unknown",updatePage:"Update page",details:"Details",isbn:"ISBN",publisher:"Publisher",year:"Year",pages:"Pages",format:"Format",ownership:"Ownership",categories:"Categories",added:"Added",started:"Started",ended:"Finished on",rating:"Rating",favorite:"Favorite",notes:"Notes",noNotes:"No notes yet",addNote:"Add note",sessions:"Reading sessions",deleteBook:"Delete book",confirmDelete:"Delete this book?",delete:"Delete",cancel:"Cancel",save:"Save",title:"Title",author:"Author",cover:"Cover",findCover:"Find cover online",addBook:"Add book",scan:"Scan barcode",scanSub:"Scan one or more barcodes",searchOnline:"Search online",searchOnlineSub:"By title, author or ISBN",manual:"Enter manually",manualSub:"Fill in all details yourself",newBook:"New book",hardcover:"Hardcover",paperback:"Paperback",ebook:"E-book",audiobook:"Audiobook",owned:"Owned",notOwned:"Not owned",borrowed:"Borrowed",scanned:"Scanned books",scanHint:"Point the camera at the barcode on the back",alreadyHave:"Already in your library",willAdd:"New",notFound:"Not found, will be added with ISBN only",addN:"Add ({n})",cameraErr:"Camera unavailable. Allow access in Settings > Safari > Camera.",goal:"{n}m to goal",goalDone:"Daily goal reached",pause:"Pause",resume:"Resume",finish:"Finish",untilPage:"Which page did you read up to?",markFinished:"Mark as finished?",yes:"Yes",no:"No",playlist:"Playlist",openPlaylist:"Open playlist",coverSearch:"Find cover",googleImages:"Search Google Images",pasteHint:"Long-press an image in Safari, choose 'Copy' and tap 'Paste' here",pasteHere:"Tap here and choose Paste",choosePhoto:"Choose or take photo",noResults:"No results",coverSaved:"Cover saved",removeCover:"Remove cover",language:"Language",auto:"Automatic",dailyGoal:"Daily reading goal (minutes)",playlistUrl:"Playlist link (Spotify or Apple Music)",playlistHint:"Paste a playlist share link. When you start reading mode you can open it with one tap.",appearance:"Appearance",system:"System",light:"Light",dark:"Dark",data:"Data",importCsv:"Import Bookshelf export (zip or CSV)",exportJson:"Make backup (JSON)",importJson:"Restore backup",deleteAll:"Erase all data",confirmDeleteAll:"Erase all books and sessions? This cannot be undone.",imported:"{n} books imported, {d} duplicates skipped",emptyLib:"Your library is empty",emptyHint:"Import your Bookshelf export or add your first book.",loadSeed:"Load my export (Mar 2026)",nothingReading:"You're not reading anything. Open a book and tap Reading Mode.",yearBooks:"Books finished in {y}",yearPages:"Pages read in {y}",totalTime:"Total reading time",streak:"Reading streak (days)",last7:"Reading time, last 7 days",perMonth:"Finished per month in {y}",min:"min",saved:"Saved",progressSaved:"Progress saved",backupMade:"Backup created",lookup:"Looking up…",searchBtn:"Search",noTitle:"Untitled",unknownAuthor:"Unknown author",sessionSaved:"{m} min session saved",install:"Add to Home Screen: tap Share and choose 'Add to Home Screen'.",duplicateWarn:"You already have this book",openExisting:"Open existing",addAnyway:"Add anyway",notePh:"Write your note…",page:"Page",fromPage:"From page {n}",about:"About",version:"Version"}
+};
+let LANG="nl";
+function t(k,v){let s=(STR[LANG]&&STR[LANG][k])||STR.nl[k]||k;if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s}
+
+//#PURE-START
+/* ---------- pure helpers ---------- */
+function parseCSV(text){
+  text=text.replace(/^﻿/,"");const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c=='"'){if(text[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c=='"')q=true;else if(c==','){row.push(f);f=""}
+    else if(c=='\n'||c=='\r'){if(c=='\r'&&text[i+1]=='\n')i++;row.push(f);rows.push(row);row=[];f=""}
+    else f+=c}
+  if(f!==""||row.length){row.push(f);rows.push(row)}
+  const head=(rows.shift()||[]).map(h=>h.trim());
+  return rows.filter(r=>r.some(x=>x.trim()!=="")).map(r=>{const o={};head.forEach((h,i)=>o[h]=(r[i]||"").trim());return o});
+}
+const MONTHS={jan:0,feb:1,mar:2,mrt:2,apr:3,may:4,mei:4,jun:5,jul:6,aug:7,sep:8,oct:9,okt:9,nov:10,dec:11};
+function parseDate(s){if(!s)return null;s=s.trim();
+  let m=s.match(/^(\d{1,2})[ \-.]([A-Za-z]{3})[a-z]*\.?[ \-.,]+(\d{4})/);
+  if(m&&MONTHS[m[2].toLowerCase()]!=null)return new Date(Date.UTC(+m[3],MONTHS[m[2].toLowerCase()],+m[1],12)).toISOString();
+  m=s.match(/^([A-Za-z]{3})[a-z]*\.? (\d{1,2}),? (\d{4})/);
+  if(m&&MONTHS[m[1].toLowerCase()]!=null)return new Date(Date.UTC(+m[3],MONTHS[m[1].toLowerCase()],+m[2],12)).toISOString();
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return new Date(Date.UTC(+m[1],+m[2]-1,+m[3],12)).toISOString();
+  const d=new Date(s);return isNaN(d)?null:d.toISOString()}
+function cleanIsbn(s){return (s||"").toUpperCase().replace(/[^0-9X]/g,"")}
+function isbn13(s){s=cleanIsbn(s);if(s.length===13)return s;if(s.length!==10)return s;
+  const b="978"+s.slice(0,9);let sum=0;for(let i=0;i<12;i++)sum+=(+b[i])*(i%2?3:1);return b+((10-sum%10)%10)}
+function normKey(b){return (b.title||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,40)+"|"+(b.author||"").toLowerCase().replace(/[^a-z]/g,"").slice(0,12)}
+const STATUS_MAP={"voltooid":"finished","gelezen":"finished","te lezen":"toread","lezen":"reading","aan het lezen":"reading","verlanglijst":"wishlist","verlaten":"abandoned","finished":"finished","read":"finished","to read":"toread","want to read":"toread","reading":"reading","currently reading":"reading","wishlist":"wishlist","abandoned":"abandoned","did not finish":"abandoned"};
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function rowToBook(r){
+  const g=(...ks)=>{for(const k of ks){if(r[k]!=null&&r[k]!=="")return r[k]}return ""};
+  const st=STATUS_MAP[g("Reading Status","Status","Shelf").toLowerCase()]||"toread";
+  const rating=parseInt((g("Rating")||"0").split("/")[0])||0;
+  const pages=parseInt(g("Page Count","Pages"))||0;
+  const progRaw=g("Current Page","Progress","Pages Read");
+  let progress=parseInt(progRaw)||0;if(st==="finished"&&pages)progress=pages;
+  const fmt=g("Format").toLowerCase();
+  const own=g("Ownership","Ownership Status").toLowerCase();
+  return {id:uid(),title:g("Title")||"",author:g("Author","Authors")||"",isbn:cleanIsbn(g("ISBN-13","ISBN","ISBN13","ISBN 13","ISBN-10")),srcId:g("ID"),
+    publisher:g("Publisher"),year:parseInt(g("Publishing Year","Year Published","Year"))||0,pages,
+    categories:g("Category","Categories").split(",").map(s=>s.trim()).filter(Boolean),
+    added:parseDate(g("Date Added"))||new Date().toISOString(),status:st,
+    start:parseDate(g("Start Date","Date Started")),end:parseDate(g("End Date","Date Finished","Date Read")),
+    rating,favorite:/^(yes|ja|true|1)$/i.test(g("Is Favorite","Favorite?","Favorite","Favourite")),collections:[],
+    format:fmt.includes("paper")?"paperback":fmt.includes("ebook")||fmt.includes("e-book")?"ebook":fmt.includes("audio")?"audiobook":"hardcover",
+    owned:own?(own.includes("not")||own.includes("niet")?"notOwned":own.includes("borrow")||own.includes("leen")?"borrowed":"owned"):(st==="wishlist"?"notOwned":"owned"),
+    progress,cover:"",notes:[],sessions:[]};
+}
+function mergeImport(existing,rows,history,collections){
+  const hist={};(history||[]).forEach(h=>{const k=h["Book ID"];if(!hist[k]||(+h["Read Number"]||0)>=(+hist[k]["Read Number"]||0))hist[k]=h});
+  const cols={};(collections||[]).filter(c=>/^(collecties|collections|custom)$/i.test(c.Type||"")||c.Type==="Geleend").forEach(c=>(c["Book IDs"]||"").split(";").forEach(id=>{id=id.trim();if(id)(cols[id]=cols[id]||[]).push(c.Title)}));
+  const pool=existing.slice();const added=[],updated=[];
+  for(const r of rows){const b=rowToBook(r);if(!b.title)continue;
+    const h=hist[b.srcId];if(h){const pc=parseFloat(h["Percent Complete"])||0;if(b.pages&&pc>0)b.progress=Math.min(b.pages,Math.round(pc*b.pages));
+      if(!b.rating)b.rating=Math.round(parseFloat(h.Rating)||0);b.start=b.start||parseDate(h["Start Date"]);b.end=b.end||parseDate(h["End Date"])}
+    const c=cols[b.srcId]||[];if(c.includes("Geleend"))b.owned="borrowed";b.collections=c.filter(x=>x!=="Geleend");
+    let d=(b.srcId&&pool.find(x=>x.srcId===b.srcId))||findDuplicate(pool,b);
+    if(d){pool.splice(pool.indexOf(d),1);const keep={id:d.id,cover:d.cover,notes:d.notes||[],sessions:d.sessions||[],lastRead:d.lastRead};
+      if((d.sessions||[]).length&&d.progress>b.progress)keep.progress=d.progress;Object.assign(d,b,keep);updated.push(d)}
+    else added.push(b)}
+  return {added,updated}}
+function findDuplicate(books,b){const i13=b.isbn?isbn13(b.isbn):"";const k=normKey(b);
+  return books.find(x=>(i13&&x.isbn&&isbn13(x.isbn)===i13)||(!i13||!x.isbn)&&normKey(x)===k&&b.title)}
+function dayKey(d){d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function streak(sessions,now){const days=new Set(sessions.map(s=>dayKey(s.date)));let n=0;const d=new Date(now);
+  if(!days.has(dayKey(d)))d.setDate(d.getDate()-1);while(days.has(dayKey(d))){n++;d.setDate(d.getDate()-1)}return n}
+//#PURE-END
+
+/* ---------- storage (IndexedDB with memory fallback) ---------- */
+const DB={db:null,mem:{books:new Map(),kv:new Map()},
+ open(){return new Promise(res=>{try{const r=indexedDB.open("boekenkast",1);
+   r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore("books",{keyPath:"id"});d.createObjectStore("kv")};
+   r.onsuccess=()=>{this.db=r.result;res()};r.onerror=()=>res();}catch(e){res()}})},
+ tx(store,mode,fn){return new Promise((res,rej)=>{if(!this.db){res(fn(null));return}
+   const tx=this.db.transaction(store,mode);const st=tx.objectStore(store);const out=fn(st);
+   tx.oncomplete=()=>res(out&&out.result!==undefined?out.result:out);tx.onerror=()=>rej(tx.error)})},
+ async all(){if(!this.db)return [...this.mem.books.values()];return this.tx("books","readonly",s=>s.getAll())},
+ async put(b){if(!this.db){this.mem.books.set(b.id,b);return}return this.tx("books","readwrite",s=>{s.put(b)})},
+ async putMany(bs){if(!this.db){bs.forEach(b=>this.mem.books.set(b.id,b));return}return this.tx("books","readwrite",s=>{bs.forEach(b=>s.put(b))})},
+ async del(id){if(!this.db){this.mem.books.delete(id);return}return this.tx("books","readwrite",s=>{s.delete(id)})},
+ async clear(){if(!this.db){this.mem.books.clear();return}return this.tx("books","readwrite",s=>{s.clear()})},
+ async get(k){if(!this.db)return this.mem.kv.get(k);return this.tx("kv","readonly",s=>s.get(k))},
+ async set(k,v){if(!this.db){this.mem.kv.set(k,v);return}return this.tx("kv","readwrite",s=>{s.put(v,k)})}
+};
+
+/* ---------- state ---------- */
+const S={books:[],stack:[{v:"home"}],tab:"books",settings:{lang:"auto",goal:30,playlist:"",theme:"system"},session:null,sort:"added",q:""};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const byId=id=>S.books.find(b=>b.id===id);
+function fmtDate(iso){if(!iso)return "–";return new Date(iso).toLocaleDateString(LANG==="nl"?"nl-NL":"en-GB",{day:"numeric",month:"short",year:"numeric"})}
+function toast(msg){const el=document.createElement("div");el.className="toast";el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),2400)}
+function applySettings(){const l=S.settings.lang;LANG=l==="auto"?((navigator.language||"nl").toLowerCase().startsWith("nl")?"nl":"en"):l;
+  document.documentElement.lang=LANG;const th=S.settings.theme;if(th==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",th)}
+async function saveSettings(){await DB.set("settings",S.settings);applySettings()}
+async function saveBook(b){const i=S.books.findIndex(x=>x.id===b.id);if(i<0)S.books.push(b);else S.books[i]=b;await DB.put(b)}
+
+/* ---------- cover rendering ---------- */
+const PALS=[["#5b3a8c","#2b1b47"],["#1f5f8b","#0e2c42"],["#8b2f3c","#3f141b"],["#2f6b4f","#123224"],["#8a6a1f","#3d2e0b"],["#3d4a8c","#1a2047"],["#7a3d6b","#36192f"],["#2d6a73","#0f2f33"]];
+function hash(s){let h=0;for(const c of s||"")h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)}
+function coverHTML(b,cls=""){const p=PALS[hash(b.title)%PALS.length];
+  const ph=`<div class="ph" style="background:linear-gradient(160deg,${p[0]},${p[1]})"><div class="pt">${esc(b.title||t("noTitle"))}</div><div class="pa">${esc(b.author)}</div></div>`;
+  const img=b.cover?`<img src="${esc(b.cover)}" alt="" loading="lazy" onerror="this.remove()">`:"";
+  return `<div class="cover ${cls}">${ph}${img}</div>`}
+function bgStyle(b){return b.cover?`style="background-image:url('${esc(b.cover).replace(/'/g,"%27")}')"`:`style="background:linear-gradient(160deg,${PALS[hash(b.title)%PALS.length].join(",")})"`}
+
+/* ---------- navigation ---------- */
+function go(v,p={}){S.stack.push({v,...p});render();window.scrollTo(0,0)}
+function back(){if(S.stack.length>1)S.stack.pop();render()}
+function cur(){return S.stack[S.stack.length-1]}
+function setTab(tab){S.tab=tab;S.stack=[{v:tab==="books"?"home":tab}];render();window.scrollTo(0,0)}
+
+const FILTERS={owned:b=>b.status!=="wishlist",wishlist:b=>b.status==="wishlist",toread:b=>b.status==="toread",reading:b=>b.status==="reading",finished:b=>b.status==="finished",abandoned:b=>b.status==="abandoned",favorites:b=>b.favorite,all:b=>true};
+function filterFn(f){return f.startsWith("c:")?(b=>(b.collections||[]).includes(f.slice(2))):FILTERS[f]}
+function filterName(f){return f.startsWith("c:")?f.slice(2):t(f)}
+const FICON={owned:I.books,all:I.books,wishlist:I.heart,toread:I.fwd,reading:I.open,finished:I.check,abandoned:I.close,favorites:I.star};
+
+/* ---------- views ---------- */
+function vHome(){
+  const reading=S.books.filter(b=>b.status==="reading").sort((a,b)=>(b.lastRead||b.start||"").localeCompare(a.lastRead||a.start||""));
+  let h=`<div class="topbar"><button class="pill icon" data-a="settings" aria-label="${t("settings")}">${I.gear}</button><div class="sp"></div><button class="pill icon" data-a="add" aria-label="${t("addBook")}">${I.plus}</button></div>
+  <h1 class="large">${t("library")}</h1>`;
+  if(!S.books.length){h+=`<div class="empty"><b>${t("emptyLib")}</b><p>${t("emptyHint")}</p>
+     <div class="btnrow" style="display:flex;flex-direction:column;gap:10px">
+     ${window.SEED_CSV?`<button class="btn blue" data-a="seed">${t("loadSeed")}</button>`:""}
+     <button class="btn" data-a="importcsv">${t("importCsv")}</button><button class="btn" data-a="add">${t("addBook")}</button></div></div>`;return h}
+  h+=`<h2 class="sec">${t("nowReading")}</h2>`;
+  if(reading.length){h+=`<div class="carousel">`+reading.map(b=>{const pct=b.pages?Math.min(100,b.progress/b.pages*100):0;
+    return `<div class="nowcard" data-a="open" data-id="${b.id}" role="button" tabindex="0"><div class="bgimg" ${bgStyle(b)}></div>${coverHTML(b,"cov")}
+    <div class="meta"><div class="t">${esc(b.title)}</div><div class="a">${esc(b.author)}</div>
+    <div class="prog"><div class="bar"><i style="width:${pct}%"></i></div>${t("page")} ${b.progress||0}</div></div>
+    <button class="play" data-a="read" data-id="${b.id}" aria-label="${t("readMode")}">${I.play}</button></div>`}).join("")+`</div>`}
+  else h+=`<div class="empty">${t("nothingReading")}</div>`;
+  const rowF=(k,icon)=>{const n=S.books.filter(filterFn(k)).length;return `<button class="row big" data-a="list" data-f="${esc(k)}"><span class="ico">${icon}</span><span class="lbl">${esc(filterName(k))}</span><span class="val">${n}</span><span class="chev">${I.chev}</span></button>`};
+  h+=`<h2 class="sec">${t("collection")}</h2><div class="group" style="--inset:74px">`+["owned","wishlist","toread","reading","finished"].map(k=>rowF(k,FICON[k])).join("")+`</div>`;
+  const cols=[...new Set(S.books.flatMap(b=>b.collections||[]))].sort();
+  const extra=["favorites",...(S.books.some(FILTERS.abandoned)?["abandoned"]:[]),"all"];
+  h+=`<h2 class="sec">${t("more")}</h2><div class="group" style="--inset:74px">`+cols.map(c=>rowF("c:"+c,I.open.replace('fill="currentColor"','fill="none" stroke="currentColor" stroke-width="2"'))).join("")+extra.map(k=>rowF(k,FICON[k])).join("")+`</div>`;
+  return h}
+
+function sortBooks(list){const s=S.sort;return list.sort((a,b)=>s==="title"?a.title.localeCompare(b.title):s==="author"?(a.author||"").localeCompare(b.author||""):s==="year"?(b.year||0)-(a.year||0):(b.added||"").localeCompare(a.added||""))}
+function vList(p){
+  const q=S.q.toLowerCase();let list=S.books.filter(filterFn(p.f));
+  if(q)list=list.filter(b=>(b.title+" "+b.author+" "+b.isbn).toLowerCase().includes(q));
+  sortBooks(list);
+  return `<div class="topbar"><button class="pill icon" data-a="back" aria-label="Back">${I.back}</button><div class="sp"></div><button class="pill icon" data-a="add" aria-label="${t("addBook")}">${I.plus}</button></div>
+  <h1 class="large">${esc(filterName(p.f))}</h1>
+  <div class="search">${I.search}<input id="q" type="search" placeholder="${t("searchLib")}" value="${esc(S.q)}" autocomplete="off"></div>
+  <div class="toolbar"><span>${list.length} ${t("books_n")}</span><button data-a="sort">${t("sort")} ${I.sort.replace("<svg","<svg width=16 height=16")}</button></div>
+  <div class="grid" id="grid">${gridHTML(list)}</div>`}
+function gridHTML(list){return list.map(b=>`<button data-a="open" data-id="${b.id}" aria-label="${esc(b.title)}"><div style="position:relative">${coverHTML(b)}${b.status==="finished"?`<span class="badge">${I.check}</span>`:""}${b.favorite?`<span class="badge fav">${I.heart}</span>`:""}</div><div class="gt">${esc(b.title)}</div></button>`).join("")||`<p style="color:var(--fg2);grid-column:1/-1">${t("noResults")}</p>`}
+
+function ring(pct){const r=30,c=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 72 72"><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--card2)" stroke-width="8"/><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct/100)}" transform="rotate(-90 36 36)"/><text x="36" y="41" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">${Math.round(pct)}%</text></svg>`}
+function vDetail(p){const b=byId(p.id);if(!b)return vHome();
+  const pct=b.pages?Math.min(100,(b.progress||0)/b.pages*100):0;
+  const mins=(b.sessions||[]).reduce((a,s)=>a+s.minutes,0);
+  const row=(l,v)=>`<div class="row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`;
+  return `<div class="hero"><div class="bgimg" ${bgStyle(b)}></div>
+   <button class="pill icon back" data-a="back" aria-label="Back">${I.back}</button><button class="pill icon more" data-a="bookmenu" data-id="${b.id}" aria-label="Menu">${I.more}</button>
+   <div style="position:relative;width:46%;max-width:220px;margin:0 auto">${coverHTML(b).replace('class="cover "','class="cover " style="width:100%;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.35)"')}${b.status==="reading"?`<span class="pagechip">${t("page")} ${b.progress||0}</span>`:""}</div>
+   <h1>${esc(b.title)}</h1><div class="au">${esc(b.author||t("unknownAuthor"))}</div>
+   <div class="actions"><button class="act primary" data-a="read" data-id="${b.id}"><span class="c">${I.play}</span>${t("readMode")}</button>
+   <button class="act" data-a="status" data-id="${b.id}"><span class="c">${FICON[b.status]}</span>${t(b.status)}</button>
+   <button class="act" data-a="edit" data-id="${b.id}"><span class="c">${I.pencil}</span>${t("edit")}</button></div></div>
+  <h2 class="sec">${t("progress")}</h2>
+  <div class="progcard"><div class="pc"><div class="big">${b.pages?t("pagesRead",{a:b.progress||0,b:b.pages}):t("noPages")}</div>
+   <div class="sub">${mins?`${mins} ${t("min")} · ${(b.sessions||[]).length} ${t("sessions").toLowerCase()}`:""}</div>
+   <button class="row accent" style="padding:8px 0 0;min-height:0" data-a="setpage" data-id="${b.id}">${t("updatePage")}</button></div>${b.pages?ring(pct):""}</div>
+  <div class="cap">${t("rating")}</div><div class="group"><div class="row"><span class="stars">${[1,2,3,4,5].map(n=>`<button data-a="rate" data-id="${b.id}" data-n="${n}" class="${n<=b.rating?"on":"off"}" aria-label="${n}">${I.star}</button>`).join("")}</span><span class="lbl"></span><button data-a="fav" data-id="${b.id}" style="color:${b.favorite?"#ff375f":"var(--fg3)"};width:28px" aria-label="${t("favorite")}">${I.heart}</button></div></div>
+  <div class="cap">${t("details")}</div><div class="group">
+   ${row(t("isbn"),esc(b.isbn||"–"))}${row(t("publisher"),esc(b.publisher||"–"))}${row(t("year"),b.year||"–")}${row(t("pages"),b.pages||"–")}
+   ${row(t("format"),t(b.format||"hardcover"))}${row(t("ownership"),t(b.owned||"owned"))}
+   <div class="row"><span class="lbl">${t("categories")}</span><span class="chips">${(b.categories||[]).map(c=>`<span class="chip">${esc(c)}</span>`).join("")||'<span class="val">–</span>'}</span></div>
+   ${(b.collections||[]).length?`<div class="row"><span class="lbl">${t("collections")}</span><span class="chips">${b.collections.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</span></div>`:""}${row(t("added"),fmtDate(b.added))}${row(t("started"),fmtDate(b.start))}${row(t("ended"),fmtDate(b.end))}</div>
+  <div class="cap">${t("notes")}</div><div class="group">${(b.notes||[]).map(n=>`<div class="note"><small>${fmtDate(n.date)}${n.page?` · ${t("page")} ${n.page}`:""}</small>${esc(n.text)}</div>`).join("")||`<div class="note" style="color:var(--fg2)">${t("noNotes")}</div>`}
+   <button class="row accent" data-a="addnote" data-id="${b.id}" style="border-top:.5px solid var(--sep)">${t("addNote")}</button></div>
+  <div class="group" style="margin-top:28px"><button class="row danger" data-a="delbook" data-id="${b.id}">${t("deleteBook")}</button></div>`}
+
+function vEdit(p){const b=p.id?byId(p.id):p.draft;if(!b)return vHome();
+  const inp=(k,l,type="text")=>`<label class="row"><span class="lbl" style="flex:none">${l}</span><input id="f_${k}" type="${type}" value="${esc(b[k]||"")}" ${type==="number"?'inputmode="numeric"':""}></label>`;
+  const sel=(k,l,opts)=>`<label class="row"><span class="lbl">${l}</span><select id="f_${k}">${opts.map(o=>`<option value="${o}" ${b[k]===o?"selected":""}>${t(o)}</option>`).join("")}</select></label>`;
+  return `<div class="topbar"><button class="pill" data-a="back">${t("cancel")}</button><div class="sp"></div><button class="pill" style="color:var(--accent);font-weight:700" data-a="saveedit">${t("save")}</button></div>
+  <h1 class="large">${p.id?t("edit"):t("newBook")}</h1>
+  <div style="display:flex;gap:16px;align-items:center"><div style="width:96px;flex:none">${coverHTML(b)}</div>
+   <div style="display:flex;flex-direction:column;gap:8px;flex:1"><button class="btn blue" data-a="coversearch">${t("findCover")}</button>${b.cover?`<button class="btn red" data-a="rmcover">${t("removeCover")}</button>`:""}</div></div>
+  <div class="cap">${t("details")}</div><div class="group">${inp("title",t("title"))}${inp("author",t("author"))}${inp("isbn",t("isbn"))}${inp("publisher",t("publisher"))}${inp("year",t("year"),"number")}${inp("pages",t("pages"),"number")}
+   <label class="row"><span class="lbl" style="flex:none">${t("categories")}</span><input id="f_categories" value="${esc((b.categories||[]).join(", "))}"></label>
+   <label class="row"><span class="lbl" style="flex:none">${t("collections")}</span><input id="f_collections" placeholder="${t("collectionsPh")}" value="${esc((b.collections||[]).join(", "))}"></label></div>
+  <div class="cap">${t("status")}</div><div class="group">${sel("status",t("status"),["toread","reading","finished","wishlist","abandoned"])}${sel("format",t("format"),["hardcover","paperback","ebook","audiobook"])}${sel("owned",t("ownership"),["owned","notOwned","borrowed"])}</div>`}
+
+function vStats(){
+  const y=new Date().getFullYear();const all=S.books.flatMap(b=>(b.sessions||[]));
+  const fin=S.books.filter(b=>b.status==="finished"&&b.end&&new Date(b.end).getFullYear()===y);
+  const pagesY=all.filter(s=>new Date(s.date).getFullYear()===y).reduce((a,s)=>a+Math.max(0,(s.to||0)-(s.from||0)),0)+fin.filter(b=>!(b.sessions||[]).length).reduce((a,b)=>a+(b.pages||0),0);
+  const tot=all.reduce((a,s)=>a+s.minutes,0);
+  const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);const k=dayKey(d);return {l:d.toLocaleDateString(LANG==="nl"?"nl-NL":"en-GB",{weekday:"short"}).slice(0,2),v:all.filter(s=>dayKey(s.date)===k).reduce((a,s)=>a+s.minutes,0)}});
+  const months=[...Array(12)].map((_,m)=>({l:new Date(y,m,1).toLocaleDateString(LANG==="nl"?"nl-NL":"en-GB",{month:"narrow"}),v:fin.filter(b=>new Date(b.end).getMonth()===m).length}));
+  const bars=(data,unit)=>{const W=320,H=150,top=18,bottom=22,max=Math.max(1,...data.map(d=>d.v));const bw=W/data.length;
+    return `<svg viewBox="0 0 ${W} ${H}" role="img">${[0,.5,1].map(f=>`<line x1="0" x2="${W}" y1="${top+(H-top-bottom)*(1-f)}" y2="${top+(H-top-bottom)*(1-f)}" stroke="var(--sep)" stroke-width="1"/>`).join("")}
+    ${data.map((d,i)=>{const h=(H-top-bottom)*d.v/max;const x=i*bw+bw*.2;return `<rect x="${x}" y="${H-bottom-h}" width="${bw*.6}" height="${Math.max(h,d.v?2:0)}" rx="4" fill="var(--accent)"/>${d.v?`<text x="${x+bw*.3}" y="${H-bottom-h-5}" text-anchor="middle" font-size="11" fill="var(--fg2)">${d.v}</text>`:""}<text x="${x+bw*.3}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--fg2)">${esc(d.l)}</text>`}).join("")}</svg>`};
+  return `<h1 class="large" style="margin-top:56px">${t("stats")}</h1>
+  <div class="tiles"><div class="tile"><div class="n">${fin.length}</div><div class="l">${t("yearBooks",{y})}</div></div>
+  <div class="tile"><div class="n">${pagesY.toLocaleString(LANG)}</div><div class="l">${t("yearPages",{y})}</div></div>
+  <div class="tile"><div class="n">${Math.floor(tot/60)}u ${tot%60}m</div><div class="l">${t("totalTime")}</div></div>
+  <div class="tile"><div class="n">${streak(all,new Date())}</div><div class="l">${t("streak")}</div></div></div>
+  <div class="cap">${t("last7")} (${t("min")})</div><div class="chart">${bars(days)}</div>
+  <div class="cap">${t("perMonth",{y})}</div><div class="chart">${bars(months)}</div>`}
+
+function vSettings(){const st=S.settings;
+  const seg=(k,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button data-a="setopt" data-k="${k}" data-v="${v}" class="${String(st[k])===v?"on":""}">${l}</button>`).join("")}</div>`;
+  return `<div class="topbar"><button class="pill icon" data-a="back" aria-label="Back">${I.back}</button></div>
+  <h1 class="large">${t("settings")}</h1>
+  <div class="cap">${t("language")}</div><div class="group"><div class="row">${seg("lang",[["auto",t("auto")],["nl","Nederlands"],["en","English"]])}</div></div>
+  <div class="cap">${t("appearance")}</div><div class="group"><div class="row">${seg("theme",[["system",t("system")],["light",t("light")],["dark",t("dark")]])}</div></div>
+  <div class="cap">${t("readMode")}</div><div class="group">
+   <label class="row"><span class="lbl">${t("dailyGoal")}</span><input id="s_goal" type="number" inputmode="numeric" value="${st.goal}" style="max-width:80px"></label>
+   <label class="row" style="flex-wrap:wrap"><span class="lbl" style="flex-basis:100%">${t("playlistUrl")}</span><input id="s_playlist" type="url" placeholder="https://open.spotify.com/playlist/…" value="${esc(st.playlist)}" style="text-align:left"></label></div>
+  <p class="hint">${t("playlistHint")}</p>
+  <div class="cap">${t("data")}</div><div class="group">
+   <button class="row accent" data-a="importcsv">${t("importCsv")}</button>
+   <button class="row accent" data-a="exportjson">${t("exportJson")}</button>
+   <button class="row accent" data-a="importjson">${t("importJson")}</button>
+   ${window.SEED_CSV?`<button class="row accent" data-a="seed">${t("loadSeed")}</button>`:""}
+   <button class="row" style="color:var(--red)" data-a="deleteall">${t("deleteAll")}</button></div>
+  <p class="hint">${t("install")}</p>
+  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.1</p>`}
+
+/* ---------- render ---------- */
+function render(){const c=cur();let h="";
+  if(c.v==="home")h=vHome();else if(c.v==="list")h=vList(c);else if(c.v==="detail")h=vDetail(c);else if(c.v==="edit")h=vEdit(c);
+  else if(c.v==="stats")h=vStats();else if(c.v==="settings")h=vSettings();
+  $("#app").innerHTML=`<div class="wrap">${h}</div>`+(c.v==="edit"||c.v==="settings"?"":tabbar());
+  const q=$("#q");if(q)q.addEventListener("input",e=>{S.q=e.target.value;const list=sortBooks(S.books.filter(filterFn(cur().f)).filter(b=>(b.title+" "+b.author+" "+b.isbn).toLowerCase().includes(S.q.toLowerCase())));$("#grid").innerHTML=gridHTML(list);$(".toolbar span").textContent=list.length+" "+t("books_n")});
+  ["s_goal","s_playlist"].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener("change",()=>{S.settings[id==="s_goal"?"goal":"playlist"]=id==="s_goal"?Math.max(1,parseInt(el.value)||30):el.value.trim();saveSettings();toast(t("saved"))})});
+}
+function tabbar(){return `<nav class="tabbar"><div class="tabs">
+  <button class="tab ${S.tab==="books"?"on":""}" data-a="tab" data-t="books">${I.books}${t("books")}</button>
+  <button class="tab ${S.tab==="stats"?"on":""}" data-a="tab" data-t="stats">${I.stats}${t("stats")}</button></div>
+  <button class="fab" data-a="add" aria-label="${t("addBook")}">${I.plus}</button></nav>`}
+
+/* ---------- sheets ---------- */
+function sheet(html,onClose){const L=$("#layer");const w=document.createElement("div");w.className="scrim";w.innerHTML=`<div class="sheet" role="dialog"><div class="grab"></div>${html}</div>`;
+  w.addEventListener("click",e=>{if(e.target===w){w.remove();onClose&&onClose()}});L.appendChild(w);return w}
+function closeSheets(){$("#layer").innerHTML=""}
+function confirmSheet(msg,okLabel,danger){return new Promise(res=>{const w=sheet(`<h3>${esc(msg)}</h3><div class="btnrow"><button class="btn" data-x="0">${t("cancel")}</button><button class="btn ${danger?"red":"blue"}" data-x="1">${okLabel}</button></div>`,()=>res(false));
+  w.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{w.remove();res(b.dataset.x==="1")})})}
+function numberSheet(msg,val){return new Promise(res=>{const w=sheet(`<h3>${esc(msg)}</h3><div class="field"><input id="numin" type="number" inputmode="numeric" value="${val}"></div><div class="btnrow"><button class="btn" data-x="0">${t("cancel")}</button><button class="btn blue" data-x="1">${t("save")}</button></div>`,()=>res(null));
+  const i=w.querySelector("#numin");setTimeout(()=>{i.focus();i.select()},250);
+  w.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{w.remove();res(b.dataset.x==="1"?parseInt(i.value)||0:null)})})}
+function textSheet(msg,ph){return new Promise(res=>{const w=sheet(`<h3>${esc(msg)}</h3><div class="group"><label class="row"><textarea id="txin" placeholder="${esc(ph)}"></textarea></label></div><div class="btnrow"><button class="btn" data-x="0">${t("cancel")}</button><button class="btn blue" data-x="1">${t("save")}</button></div>`,()=>res(null));
+  const i=w.querySelector("#txin");setTimeout(()=>i.focus(),250);
+  w.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{w.remove();res(b.dataset.x==="1"?i.value.trim():null)})})}
+function menuSheet(title,items){return new Promise(res=>{const w=sheet(`<h3>${esc(title)}</h3><div class="group">${items.map((it,i)=>`<button class="row ${it.danger?"":""}" data-i="${i}" style="${it.danger?"color:var(--red)":""}">${it.icon?`<span class="ico">${it.icon}</span>`:""}<span class="lbl">${esc(it.label)}${it.sub?`<br><small style="color:var(--fg2)">${esc(it.sub)}</small>`:""}</span>${it.on?`<span style="color:var(--accent);width:20px">${I.check}</span>`:""}</button>`).join("")}</div>`,()=>res(null));
+  w.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{w.remove();res(items[+b.dataset.i].value)})})}
+
+/* ---------- online lookup ---------- */
+async function getJSON(url){const r=await fetch(url);if(!r.ok)throw new Error(r.status);return r.json()}
+function gbToBook(v){const i=v.volumeInfo||{};const ids=i.industryIdentifiers||[];const isbn=(ids.find(x=>x.type==="ISBN_13")||ids.find(x=>x.type==="ISBN_10")||{}).identifier||"";
+  let cover=(i.imageLinks&&(i.imageLinks.thumbnail||i.imageLinks.smallThumbnail))||"";cover=cover.replace("http://","https://").replace("&edge=curl","");
+  return {title:i.title+(i.subtitle?": "+i.subtitle:""),author:(i.authors||[]).join(", "),isbn:cleanIsbn(isbn),publisher:i.publisher||"",year:parseInt(i.publishedDate)||0,pages:i.pageCount||0,categories:i.categories||[],cover}}
+async function lookupIsbn(isbn){isbn=cleanIsbn(isbn);
+  try{const j=await getJSON(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);if(j.items&&j.items.length){const b=gbToBook(j.items[0]);b.isbn=isbn;if(!b.cover)b.cover=`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;return b}}catch(e){}
+  try{const j=await getJSON(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);const d=j["ISBN:"+isbn];
+    if(d)return {title:d.title+(d.subtitle?": "+d.subtitle:""),author:(d.authors||[]).map(a=>a.name).join(", "),isbn,publisher:((d.publishers||[])[0]||{}).name||"",year:parseInt((d.publish_date||"").match(/\d{4}/))||0,pages:d.number_of_pages||0,categories:[],cover:(d.cover&&(d.cover.large||d.cover.medium))||""}}catch(e){}
+  return null}
+async function searchOnline(q){const out=[];const isbn=cleanIsbn(q);
+  if(isbn.length>=10&&/^\d/.test(q.trim())){const b=await lookupIsbn(isbn);if(b)out.push(b);return out}
+  try{const j=await getJSON(`https://www.googleapis.com/books/v1/volumes?maxResults=20&q=${encodeURIComponent(q)}`);(j.items||[]).forEach(v=>out.push(gbToBook(v)))}catch(e){}
+  if(!out.length){try{const j=await getJSON(`https://openlibrary.org/search.json?limit=20&q=${encodeURIComponent(q)}`);(j.docs||[]).forEach(d=>out.push({title:d.title,author:(d.author_name||[]).join(", "),isbn:cleanIsbn((d.isbn||[])[0]),publisher:(d.publisher||[])[0]||"",year:d.first_publish_year||0,pages:d.number_of_pages_median||0,categories:[],cover:d.cover_i?`https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`:""}))}catch(e){}}
+  return out}
+async function coverCandidates(b){const c=[];const seen=new Set();const add=(url,src)=>{if(url&&!seen.has(url)){seen.add(url);c.push({url,src})}};
+  const tasks=[];
+  if(b.isbn){add(`https://covers.openlibrary.org/b/isbn/${isbn13(b.isbn)}-L.jpg?default=false`,"Open Library");
+    tasks.push(getJSON(`https://www.googleapis.com/books/v1/volumes?q=isbn:${b.isbn}`).then(j=>(j.items||[]).forEach(v=>{const g=gbToBook(v);add(g.cover.replace("zoom=1","zoom=0"),"Google Books");add(g.cover,"Google Books")})).catch(()=>{}))}
+  if(b.title){const q=encodeURIComponent(b.title+(b.author?" "+b.author:""));
+    tasks.push(getJSON(`https://www.googleapis.com/books/v1/volumes?maxResults=15&q=${q}`).then(j=>(j.items||[]).forEach(v=>add(gbToBook(v).cover,"Google Books"))).catch(()=>{}));
+    tasks.push(getJSON(`https://openlibrary.org/search.json?limit=15&fields=cover_i,edition_count&title=${encodeURIComponent(b.title)}${b.author?"&author="+encodeURIComponent(b.author):""}`).then(j=>(j.docs||[]).forEach(d=>d.cover_i&&add(`https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`,"Open Library"))).catch(()=>{}))}
+  await Promise.all(tasks);return c}
+
+/* ---------- cover search screen ---------- */
+async function openCoverSearch(b,onPick){
+  const w=sheet(`<h3>${t("coverSearch")}</h3>
+   <div class="field"><input id="cq" value="${esc((b.title||"")+(b.author?" "+b.author:""))}"><button class="btn blue" id="cgo">${t("searchBtn")}</button></div>
+   <div id="cres"><div class="spinner"></div></div>
+   <div class="cap">Web</div>
+   <div class="group"><a class="row accent" id="gimg" target="_blank" rel="noopener"><span class="ico">${I.globe}</span><span class="lbl">${t("googleImages")}</span></a>
+   <label class="row accent"><span class="ico">${I.photo}</span><span class="lbl">${t("choosePhoto")}</span><input type="file" accept="image/*" id="cfile" hidden></label></div>
+   <p class="hint">${t("pasteHint")}</p>
+   <div class="paste" id="cpaste" contenteditable="true" inputmode="none">${t("pasteHere")}</div>`);
+  const setG=()=>{w.querySelector("#gimg").href="https://www.google.com/search?tbm=isch&q="+encodeURIComponent(w.querySelector("#cq").value+" book cover")};setG();
+  const pick=async url=>{w.remove();onPick(url);toast(t("coverSaved"))};
+  const run=async(q)=>{const box=w.querySelector("#cres");box.innerHTML='<div class="spinner"></div>';
+    const parts=q.split(" ");const cand=await coverCandidates(q===((b.title||"")+(b.author?" "+b.author:""))?b:{title:q,isbn:b.isbn});
+    box.innerHTML=cand.length?`<div class="cgrid">${cand.map(c=>`<button data-url="${esc(c.url)}"><div class="cover"><img src="${esc(c.url)}" alt="" onerror="this.closest('button').remove()" onload="if(this.naturalWidth<20)this.closest('button').remove()"></div><div class="src">${c.src}</div></button>`).join("")}</div>`:`<p class="hint">${t("noResults")}</p>`;
+    box.querySelectorAll("[data-url]").forEach(btn=>btn.onclick=()=>pick(btn.dataset.url))};
+  run(w.querySelector("#cq").value);
+  w.querySelector("#cgo").onclick=()=>{setG();run(w.querySelector("#cq").value)};
+  w.querySelector("#cq").addEventListener("input",setG);
+  const fromFile=f=>{const r=new FileReader();r.onload=()=>shrink(r.result).then(pick);r.readAsDataURL(f)};
+  w.querySelector("#cfile").onchange=e=>{const f=e.target.files[0];if(f)fromFile(f)};
+  const pz=w.querySelector("#cpaste");
+  pz.addEventListener("paste",e=>{e.preventDefault();const items=[...(e.clipboardData||{}).items||[]];
+    const img=items.find(i=>i.type.startsWith("image/"));if(img){fromFile(img.getAsFile());return}
+    const txt=(e.clipboardData.getData("text")||"").trim();if(/^https?:\/\//.test(txt))pick(txt)});
+}
+function shrink(dataUrl){return new Promise(res=>{const img=new Image();img.onload=()=>{const max=700;let {width:w,height:h}=img;const s=Math.min(1,max/Math.max(w,h));
+  const c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.85))};img.onerror=()=>res(dataUrl);img.src=dataUrl})}
+
+/* ---------- add book ---------- */
+async function addFlow(){const v=await menuSheet(t("addBook"),[{label:t("scan"),sub:t("scanSub"),icon:I.barcode,value:"scan"},{label:t("searchOnline"),sub:t("searchOnlineSub"),icon:I.globe,value:"search"},{label:t("manual"),sub:t("manualSub"),icon:I.pencil,value:"manual"}]);
+  if(v==="scan")openScanner();else if(v==="search")openSearch();else if(v==="manual")go("edit",{draft:newBook({})})}
+function newBook(o){return Object.assign({id:uid(),title:"",author:"",isbn:"",publisher:"",year:0,pages:0,categories:[],added:new Date().toISOString(),status:"toread",start:null,end:null,rating:0,favorite:false,format:"hardcover",owned:"owned",progress:0,cover:"",notes:[],sessions:[]},o)}
+async function addWithDupCheck(data){const d=findDuplicate(S.books,data);
+  if(d){const v=await menuSheet(t("duplicateWarn"),[{label:t("openExisting"),value:"open"},{label:t("addAnyway"),value:"add"}]);if(v==="open"){closeSheets();go("detail",{id:d.id})}if(v!=="add")return}
+  const b=newBook(data);await saveBook(b);closeSheets();go("detail",{id:b.id})}
+function openSearch(){const w=sheet(`<h3>${t("searchOnline")}</h3><div class="field"><input id="sq" type="search" placeholder="${t("searchOnlineSub")}" enterkeyhint="search"><button class="btn blue" id="sgo">${t("searchBtn")}</button></div><div class="group" id="sres" hidden></div>`);
+  const i=w.querySelector("#sq");setTimeout(()=>i.focus(),250);
+  const run=async()=>{const box=w.querySelector("#sres");box.hidden=false;box.innerHTML='<div class="spinner"></div>';const res=await searchOnline(i.value);
+    box.innerHTML=res.map((b,k)=>{const dup=findDuplicate(S.books,b);return `<button class="result" data-k="${k}">${coverHTML(b)}<span class="m"><b>${esc(b.title)}</b><span>${esc(b.author)}${b.year?" · "+b.year:""}</span>${dup?`<br><span class="dup">${t("alreadyHave")}</span>`:""}</span></button>`}).join("")||`<p class="hint" style="padding:12px">${t("noResults")}</p>`;
+    box.querySelectorAll("[data-k]").forEach(btn=>btn.onclick=()=>addWithDupCheck(res[+btn.dataset.k]))};
+  w.querySelector("#sgo").onclick=run;i.addEventListener("keydown",e=>{if(e.key==="Enter")run()})}
+
+/* ---------- scanner ---------- */
+let scanStop=null;
+async function openScanner(){
+  const el=document.createElement("div");el.className="scanner";
+  el.innerHTML=`<video playsinline muted autoplay></video><div class="frame"></div>
+  <div class="top"><button class="pill icon" id="scx" aria-label="${t("cancel")}">${I.close}</button><b>${t("scan")}</b><span style="width:44px"></span></div>
+  <div class="panel"><div class="grab"></div><h3 style="margin:4px 0 6px">${t("scanned")} <span id="scn" style="color:var(--fg2)">0</span></h3><p class="hint" style="margin:0 0 6px" id="schint">${t("scanHint")}</p><div id="sclist"></div>
+  <button class="btn primary" id="scadd" style="width:100%;margin-top:12px" hidden></button></div>`;
+  document.body.appendChild(el);
+  const found=[];const seen=new Set();const video=el.querySelector("video");
+  const draw=()=>{el.querySelector("#scn").textContent=found.length;
+    el.querySelector("#sclist").innerHTML=found.map(f=>`<div class="scanned">${coverHTML(f.b||{title:f.isbn})}<div class="m"><b>${esc(f.b?f.b.title:f.isbn)}</b>${f.loading?`<span class="okc" style="color:var(--fg2)">${t("lookup")}</span>`:f.dup?`<span class="dup">${t("alreadyHave")}</span>`:f.b&&f.b.title?`<span class="okc">${t("willAdd")} · ${esc(f.b.author)}</span>`:`<span class="dup" style="color:var(--fg2)">${t("notFound")}</span>`}</div></div>`).reverse().join("");
+    const n=found.filter(f=>!f.dup&&!f.loading).length;const btn=el.querySelector("#scadd");btn.hidden=!n;btn.textContent=t("addN",{n})};
+  const onCode=async code=>{const isbn=cleanIsbn(code);if(!(isbn.length===13||isbn.length===10)||seen.has(isbn))return;seen.add(isbn);
+    if(navigator.vibrate)navigator.vibrate(40);
+    const dupB=findDuplicate(S.books,{isbn,title:""});const f={isbn,loading:!dupB,dup:!!dupB,b:dupB||null};found.push(f);draw();
+    if(!dupB){const b=await lookupIsbn(isbn);f.loading=false;f.b=b||{title:"",isbn};f.b.isbn=isbn;
+      const d2=findDuplicate(S.books,f.b);if(d2){f.dup=true;f.b=d2}draw()}};
+  let stream=null,raf=null,zx=null,stopped=false;
+  scanStop=()=>{stopped=true;if(raf)cancelAnimationFrame(raf);if(zx)try{zx.reset()}catch(e){};if(stream)stream.getTracks().forEach(t=>t.stop());el.remove();scanStop=null};
+  el.querySelector("#scx").onclick=()=>scanStop();
+  el.querySelector("#scadd").onclick=async()=>{const add=found.filter(f=>!f.dup&&!f.loading).map(f=>newBook(Object.assign({},f.b,{isbn:f.isbn,title:f.b.title||f.isbn})));
+    for(const b of add)await saveBook(b);scanStop();toast(t("imported",{n:add.length,d:found.filter(f=>f.dup).length}));render()};
+  try{
+    if("BarcodeDetector" in window){
+      stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment",width:{ideal:1280}}});video.srcObject=stream;await video.play();
+      const det=new BarcodeDetector({formats:["ean_13","ean_8","upc_a"]});
+      const loop=async()=>{if(stopped)return;try{const r=await det.detect(video);r.forEach(x=>onCode(x.rawValue))}catch(e){}raf=requestAnimationFrame(()=>setTimeout(loop,120))};loop();
+    }else if(window.ZXing){
+      const hints=new Map();hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[ZXing.BarcodeFormat.EAN_13,ZXing.BarcodeFormat.EAN_8,ZXing.BarcodeFormat.UPC_A]);
+      zx=new ZXing.BrowserMultiFormatReader(hints,250);
+      await zx.decodeFromConstraints({video:{facingMode:"environment",width:{ideal:1280}}},video,(res)=>{if(res)onCode(res.getText())});
+      stream=video.srcObject;
+    }else throw new Error("no scanner")
+  }catch(e){el.querySelector("#schint").textContent=t("cameraErr");el.querySelector("#schint").style.color="var(--red)"}
+}
+
+/* ---------- reading mode ---------- */
+let tick=null,wake=null;
+function elapsed(s){return Math.max(0,((s.pausedAt||Date.now())-s.start-s.pausedTotal)/1000)}
+function todayMinutes(){const k=dayKey(new Date());return S.books.flatMap(b=>b.sessions||[]).filter(s=>dayKey(s.date)===k).reduce((a,s)=>a+s.minutes,0)}
+async function startReading(id){if(!S.session||S.session.bookId!==id){S.session={bookId:id,start:Date.now(),pausedTotal:0,pausedAt:null};await DB.set("session",S.session)}
+  const b=byId(id);if(b.status!=="reading"){b.status="reading";if(!b.start)b.start=new Date().toISOString();await saveBook(b)}
+  showReader()}
+function showReader(){const s=S.session;const b=byId(s.bookId);if(!b){S.session=null;DB.set("session",null);return}
+  const el=document.createElement("div");el.className="reader";el.id="reader";
+  el.innerHTML=`<div class="bgimg" ${bgStyle(b)}></div>
+  <div class="top"><button class="pill icon" id="rx" aria-label="${t("cancel")}">${I.close}</button><div style="flex:1"></div>
+   ${S.settings.playlist?`<a class="pill" href="${esc(S.settings.playlist)}" target="_blank" rel="noopener" style="color:#fff;background:rgba(255,255,255,.2);text-decoration:none">${I.music}${t("playlist")}</a>`:""}
+   <button class="pill" id="rf" style="font-weight:700">${t("finish")}</button></div>
+  <div style="position:relative">${coverHTML(b)}<span class="pagechip">${t("fromPage",{n:b.progress||0})}</span></div>
+  <div class="goal" id="rgoal"></div><div class="time" id="rtime">0:00</div>
+  <div class="ctrls"><button class="act" id="rnote"><span class="c">${I.note}</span>${t("addNote")}</button>
+   <button class="act primary" id="rp"><span class="c" id="rpi"></span><span id="rpl"></span></button></div>`;
+  document.body.appendChild(el);
+  const upd=()=>{const e=elapsed(S.session);const m=Math.floor(e/60),sec=Math.floor(e%60),h=Math.floor(m/60);
+    el.querySelector("#rtime").textContent=h?`${h}:${String(m%60).padStart(2,"0")}:${String(sec).padStart(2,"0")}`:`${m}:${String(sec).padStart(2,"0")}`;
+    const left=Math.ceil(S.settings.goal-todayMinutes()-e/60);
+    el.querySelector("#rgoal").innerHTML=left>0?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>${t("goal",{n:left})}`:`${I.check.replace("<svg",'<svg style="width:26px;height:26px"')}${t("goalDone")}`;
+    const p=!!S.session.pausedAt;el.querySelector("#rpi").innerHTML=p?I.play:I.pause;el.querySelector("#rpl").textContent=p?t("resume"):t("pause")};
+  upd();clearInterval(tick);tick=setInterval(upd,500);
+  try{navigator.wakeLock&&navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{})}catch(e){}
+  const close=()=>{clearInterval(tick);el.remove();try{wake&&wake.release()}catch(e){};render()};
+  el.querySelector("#rp").onclick=async()=>{const s=S.session;if(s.pausedAt){s.pausedTotal+=Date.now()-s.pausedAt;s.pausedAt=null}else s.pausedAt=Date.now();await DB.set("session",s);upd()};
+  el.querySelector("#rx").onclick=async()=>{if(await confirmSheet(LANG==="nl"?"Sessie stoppen zonder op te slaan?":"Stop session without saving?",LANG==="nl"?"Stoppen":"Stop",true)){S.session=null;await DB.set("session",null);close()}};
+  el.querySelector("#rnote").onclick=async()=>{const txt=await textSheet(t("addNote"),t("notePh"));if(txt){b.notes=b.notes||[];b.notes.push({date:new Date().toISOString(),text:txt,page:b.progress||0});await saveBook(b);toast(t("saved"))}};
+  el.querySelector("#rf").onclick=async()=>{const s=S.session;if(!s.pausedAt){s.pausedAt=Date.now()}const mins=Math.max(1,Math.round(elapsed(s)/60));
+    const pg=await numberSheet(t("untilPage"),b.progress||0);if(pg===null){if(s.pausedAt&&!s._wasPaused){s.pausedTotal+=Date.now()-s.pausedAt;s.pausedAt=null}upd();return}
+    b.sessions=b.sessions||[];b.sessions.push({date:new Date(s.start).toISOString(),minutes:mins,from:b.progress||0,to:pg});b.progress=pg;b.lastRead=new Date().toISOString();
+    if(b.pages&&pg>=b.pages&&await confirmSheet(t("markFinished"),t("yes"))){b.status="finished";b.end=new Date().toISOString()}
+    await saveBook(b);S.session=null;await DB.set("session",null);close();toast(t("sessionSaved",{m:mins}))};
+}
+
+/* ---------- import / export ---------- */
+async function importFiles(parts){/* parts: {books:text, history:text|null, collections:text|null} */
+  const rows=parseCSV(parts.books);const res=mergeImport(S.books,rows,parts.history?parseCSV(parts.history):[],parts.collections?parseCSV(parts.collections):[]);
+  await DB.putMany(res.added.concat(res.updated));S.books.push(...res.added);
+  toast(t("importedU",{n:res.added.length,u:res.updated.length}));render();fetchMissingCovers(res.added.concat(res.updated))}
+async function importUpload(f){try{
+  if(/\.zip$/i.test(f.name)||f.type.includes("zip")){const z=await JSZip.loadAsync(f);const files=Object.values(z.files).filter(x=>!x.dir&&/\.csv$/i.test(x.name)&&!/__MACOSX/.test(x.name));
+    const find=re=>files.find(x=>re.test(x.name.split("/").pop()));const bk=find(/books/i)||files[0];if(!bk)throw new Error("no csv");
+    const h=find(/reading.?history/i),c=find(/collections/i);
+    await importFiles({books:await bk.async("string"),history:h?await h.async("string"):null,collections:c?await c.async("string"):null})}
+  else await importFiles({books:await f.text()})}catch(e){toast(t("importErr"))}}
+async function fetchMissingCovers(list){for(const b of list.filter(x=>!x.cover)){
+  if(!b.isbn){try{const j=await getJSON(`https://www.googleapis.com/books/v1/volumes?maxResults=1&q=${encodeURIComponent("intitle:"+b.title+(b.author?" inauthor:"+b.author:""))}`);const c=j.items&&gbToBook(j.items[0]).cover;if(c){b.cover=c;await DB.put(b);if(cur().v!=="edit")render()}}catch(e){}await new Promise(r=>setTimeout(r,200));continue}
+  const url=`https://covers.openlibrary.org/b/isbn/${isbn13(b.isbn)}-M.jpg?default=false`;
+  const ok=await new Promise(r=>{const i=new Image();i.onload=()=>r(i.naturalWidth>20);i.onerror=()=>r(false);i.src=url});
+  let cover=ok?url.replace("-M.jpg","-L.jpg"):"";
+  if(!cover){try{const j=await getJSON(`https://www.googleapis.com/books/v1/volumes?q=isbn:${b.isbn}`);if(j.items)cover=gbToBook(j.items[0]).cover}catch(e){}}
+  if(cover){b.cover=cover;await DB.put(b);if(cur().v!=="edit")render()}
+  await new Promise(r=>setTimeout(r,150))}}
+function pickFile(accept){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept=accept;i.onchange=()=>res(i.files[0]);i.click()})}
+async function exportJSON(){const data=JSON.stringify({app:"boekenkast",version:1,exported:new Date().toISOString(),books:S.books,settings:S.settings},null,1);
+  const blob=new Blob([data],{type:"application/json"});const f=new File([blob],`boekenkast-backup-${dayKey(new Date())}.json`,{type:"application/json"});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]});toast(t("backupMade"));return}catch(e){if(e.name==="AbortError")return}}
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=f.name;document.body.appendChild(a);a.click();a.remove();toast(t("backupMade"))}
+async function importJSON(){const f=await pickFile("application/json,.json");if(!f)return;try{const j=JSON.parse(await f.text());const add=[];let d=0;
+  for(const b of j.books||[]){if(findDuplicate(S.books.concat(add),b)){d++;continue}add.push(b)}await DB.putMany(add);S.books.push(...add);toast(t("imported",{n:add.length,d}));render()}catch(e){toast("JSON?")}}
+
+/* ---------- actions ---------- */
+document.addEventListener("click",async e=>{const el=e.target.closest("[data-a]");if(!el)return;const a=el.dataset.a,id=el.dataset.id;
+  if(el.closest(".nowcard")&&a==="open"&&e.target.closest(".play"))return;
+  switch(a){
+  case "tab":setTab(el.dataset.t);break;
+  case "back":back();break;
+  case "list":S.q="";go("list",{f:el.dataset.f});break;
+  case "open":go("detail",{id});break;
+  case "settings":go("settings");break;
+  case "add":addFlow();break;
+  case "read":e.stopPropagation();startReading(id);break;
+  case "edit":go("edit",{id});break;
+  case "sort":{const v=await menuSheet(t("sort"),["added","title","author","year"].map(k=>({label:t("s_"+k),value:k,on:S.sort===k})));if(v){S.sort=v;render()}break}
+  case "status":{const b=byId(id);const v=await menuSheet(t("status"),["toread","reading","finished","wishlist","abandoned"].map(k=>({label:t(k),icon:FICON[k],value:k,on:b.status===k})));
+    if(v){b.status=v;if(v==="reading"&&!b.start)b.start=new Date().toISOString();if(v==="finished"){b.end=b.end||new Date().toISOString();if(b.pages)b.progress=b.pages}if(v==="wishlist"&&b.owned==="owned")b.owned="notOwned";if(v!=="wishlist"&&b.owned==="notOwned")b.owned="owned";await saveBook(b);render()}break}
+  case "bookmenu":{const v=await menuSheet(byId(id).title,[{label:t("edit"),icon:I.pencil,value:"edit"},{label:t("findCover"),icon:I.photo,value:"cover"},{label:t("deleteBook"),value:"del",danger:true}]);
+    if(v==="edit")go("edit",{id});if(v==="cover"){const b=byId(id);openCoverSearch(b,async u=>{b.cover=u;await saveBook(b);render()})}if(v==="del"&&await confirmSheet(t("confirmDelete"),t("delete"),true)){S.books=S.books.filter(b=>b.id!==id);await DB.del(id);back()}break}
+  case "setpage":{const b=byId(id);const v=await numberSheet(t("untilPage"),b.progress||0);if(v!==null){b.progress=v;b.lastRead=new Date().toISOString();if(b.status==="toread"||b.status==="wishlist"){b.status="reading";b.start=b.start||new Date().toISOString()}
+    if(b.pages&&v>=b.pages&&b.status!=="finished"&&await confirmSheet(t("markFinished"),t("yes"))){b.status="finished";b.end=new Date().toISOString()}await saveBook(b);render();toast(t("progressSaved"))}break}
+  case "rate":{const b=byId(id);const n=+el.dataset.n;b.rating=b.rating===n?0:n;await saveBook(b);render();break}
+  case "fav":{const b=byId(id);b.favorite=!b.favorite;await saveBook(b);render();break}
+  case "addnote":{const b=byId(id);const txt=await textSheet(t("addNote"),t("notePh"));if(txt){b.notes=b.notes||[];b.notes.push({date:new Date().toISOString(),text:txt,page:b.progress||0});await saveBook(b);render()}break}
+  case "delbook":{if(await confirmSheet(t("confirmDelete"),t("delete"),true)){S.books=S.books.filter(b=>b.id!==id);await DB.del(id);back()}break}
+  case "coversearch":{const c=cur();const b=c.id?byId(c.id):c.draft;readForm(b);openCoverSearch(b,u=>{b.cover=u;render()});break}
+  case "rmcover":{const c=cur();const b=c.id?byId(c.id):c.draft;readForm(b);b.cover="";render();break}
+  case "saveedit":{const c=cur();const b=c.id?byId(c.id):c.draft;readForm(b);if(!b.title){toast(t("title")+"?");break}
+    if(!c.id){const d=findDuplicate(S.books,b);if(d){const v=await menuSheet(t("duplicateWarn"),[{label:t("openExisting"),value:"open"},{label:t("addAnyway"),value:"add"}]);if(v==="open"){S.stack.pop();go("detail",{id:d.id});break}if(v!=="add")break}}
+    if(b.status==="finished"&&b.pages&&!b.progress)b.progress=b.pages;if(b.status==="finished"&&!b.end)b.end=new Date().toISOString();if(b.status==="reading"&&!b.start)b.start=new Date().toISOString();
+    await saveBook(b);S.stack.pop();if(!c.id)go("detail",{id:b.id});else render();toast(t("saved"));break}
+  case "setopt":S.settings[el.dataset.k]=el.dataset.v;await saveSettings();render();break;
+  case "importcsv":{const f=await pickFile(".csv,.zip,text/csv,application/zip");if(f)importUpload(f);break}
+  case "seed":importFiles(window.SEED_CSV);break;
+  case "exportjson":exportJSON();break;
+  case "importjson":importJSON();break;
+  case "deleteall":if(await confirmSheet(t("confirmDeleteAll"),t("delete"),true)){await DB.clear();S.books=[];render()}break;
+  }});
+function readForm(b){const v=k=>{const el=document.getElementById("f_"+k);return el?el.value.trim():undefined};
+  ["title","author","publisher","status","format","owned"].forEach(k=>{const x=v(k);if(x!==undefined)b[k]=x});
+  const isbn=v("isbn");if(isbn!==undefined)b.isbn=cleanIsbn(isbn);
+  ["year","pages"].forEach(k=>{const x=v(k);if(x!==undefined)b[k]=parseInt(x)||0});
+  const c=v("categories");if(c!==undefined)b.categories=c.split(",").map(s=>s.trim()).filter(Boolean);const co=v("collections");if(co!==undefined)b.collections=co.split(",").map(s=>s.trim()).filter(Boolean)}
+document.addEventListener("keydown",e=>{const el=e.target.closest&&e.target.closest(".nowcard");if(el&&(e.key==="Enter"||e.key===" ")){e.preventDefault();go("detail",{id:el.dataset.id})}});
+
+/* ---------- boot ---------- */
+(async()=>{await DB.open();try{S.books=(await DB.all())||[]}catch(e){S.books=[]}
+  try{const st=await DB.get("settings");if(st)Object.assign(S.settings,st)}catch(e){}
+  applySettings();render();
+  try{S.session=await DB.get("session")||null;if(S.session&&byId(S.session.bookId))showReader()}catch(e){}
+  if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+})();
+</script>
+
+</body>
+</html>
