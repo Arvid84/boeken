@@ -476,7 +476,7 @@ function vSettings(){const st=S.settings;
    ${window.SEED_CSV?`<button class="row accent" data-a="seed">${t("loadSeed")}</button>`:""}
    <button class="row" style="color:var(--red)" data-a="deleteall">${t("deleteAll")}</button></div>
   <p class="hint">${t("install")}</p>
-  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.6</p>`}
+  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.7</p>`}
 
 /* ---------- render ---------- */
 function render(){const c=cur();let h="";
@@ -513,9 +513,10 @@ function gbToBook(v){const i=v.volumeInfo||{};const ids=i.industryIdentifiers||[
   return {title:i.title+(i.subtitle?": "+i.subtitle:""),author:(i.authors||[]).join(", "),isbn:cleanIsbn(isbn),publisher:i.publisher||"",year:parseInt(i.publishedDate)||0,pages:i.pageCount||0,categories:i.categories||[],cover}}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let GB_OFF=false,BC_OFF=false;
-const DEFAULT_GB_KEY="";
+/* restricted to https://arvid84.github.io/* and the Books API */
+const DEFAULT_GB_KEY="AIzaSyDgWYIlB_UlOATGULlWGSvfgNWkufcyhT0";
 const gbKey=()=>(S.settings.gbKey||DEFAULT_GB_KEY||"").trim();
-const COVER_V=2;
+const COVER_V=3;
 async function gbJSON(qs){/* qs: already-encoded query string after "?" */
   if(GB_OFF)return {};const k=gbKey();
   try{return await getJSON(`https://www.googleapis.com/books/v1/volumes?${qs}${k?"&key="+encodeURIComponent(k):""}`)}
