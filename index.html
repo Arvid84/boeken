@@ -357,7 +357,7 @@ const DB={db:null,mem:{books:new Map(),kv:new Map()},
 };
 
 /* ---------- state ---------- */
-const S={books:[],stack:[{v:"home"}],tab:"books",settings:{lang:"auto",goal:30,playlist:"",theme:"system",gbKey:"",gridTitles:"true"},session:null,sort:"added",q:""};
+const S={books:[],stack:[{v:"home"}],tab:"books",settings:{lang:"auto",goal:30,playlist:"",theme:"system",gbKey:"",gridTitles:"true",sort:"added"},session:null,q:""};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const byId=id=>S.books.find(b=>b.id===id);
@@ -438,7 +438,7 @@ function vHome(){
   h+=`<h2 class="sec">${t("more")}</h2><div class="group" style="--inset:74px">`+cols.map(c=>rowF("c:"+c,I.open.replace('fill="currentColor"','fill="none" stroke="currentColor" stroke-width="2"'))).join("")+extra.map(k=>rowF(k,FICON[k])).join("")+`</div>`;
   return h}
 
-function sortBooks(list){const s=S.sort;return list.sort((a,b)=>s==="title"?a.title.localeCompare(b.title):s==="author"?(a.author||"").localeCompare(b.author||""):s==="year"?(b.year||0)-(a.year||0):(b.added||"").localeCompare(a.added||""))}
+function sortBooks(list){const s=S.settings.sort||"added";return list.sort((a,b)=>s==="title"?a.title.localeCompare(b.title):s==="author"?(a.author||"").localeCompare(b.author||""):s==="year"?(b.year||0)-(a.year||0):(b.added||"").localeCompare(a.added||""))}
 function vList(p){
   const q=S.q.toLowerCase();let list=S.books.filter(filterFn(p.f));
   if(q)list=list.filter(b=>(b.title+" "+b.author+" "+b.isbn).toLowerCase().includes(q));
@@ -528,7 +528,7 @@ function vSettings(){const st=S.settings;
    ${window.SEED_CSV?`<button class="row accent" data-a="seed">${t("loadSeed")}</button>`:""}
    <button class="row" style="color:var(--red)" data-a="deleteall">${t("deleteAll")}</button></div>
   <p class="hint">${t("install")}</p>
-  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.12</p>`}
+  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.13</p>`}
 
 /* ---------- render ---------- */
 function render(){const c=cur();let h="";
@@ -861,7 +861,7 @@ document.addEventListener("click",async e=>{const el=e.target.closest("[data-a]"
   case "add":addFlow();break;
   case "read":e.stopPropagation();startReading(id);break;
   case "edit":go("edit",{id});break;
-  case "sort":{const v=await menuSheet(t("sort"),["added","title","author","year"].map(k=>({label:t("s_"+k),value:k,on:S.sort===k})));if(v){S.sort=v;render()}break}
+  case "sort":{const v=await menuSheet(t("sort"),["added","title","author","year"].map(k=>({label:t("s_"+k),value:k,on:(S.settings.sort||"added")===k})));if(v){S.settings.sort=v;await saveSettings();render()}break}
   case "status":{const b=byId(id);const v=await menuSheet(t("status"),["toread","reading","finished","wishlist","abandoned"].map(k=>({label:t(k),icon:FICON[k],value:k,on:b.status===k})));
     if(v){b.status=v;if(v==="reading"&&!b.start)b.start=new Date().toISOString();if(v==="finished"){b.end=b.end||new Date().toISOString();if(b.pages)b.progress=b.pages}if(v==="wishlist"&&b.owned==="owned")b.owned="notOwned";if(v!=="wishlist"&&b.owned==="notOwned")b.owned="owned";await saveBook(b);render()}break}
   case "bookmenu":{const v=await menuSheet(byId(id).title,[{label:t("edit"),icon:I.pencil,value:"edit"},{label:t("findCover"),icon:I.photo,value:"cover"},...(byId(id).cover?[{label:t("adjustCover"),icon:I.sort,value:"adjust"}]:[]),{label:t("deleteBook"),value:"del",danger:true}]);

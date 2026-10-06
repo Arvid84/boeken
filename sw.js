@@ -1,4 +1,4 @@
-const V="boekenkast-v13";
+const V="boekenkast-v14";
 const SHELL=["./","index.html","manifest.json","icon-192.png","icon-512.png"];
 const LIBS=["https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js","https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"];
 /* precache: app files always fresh from the server (bypass the HTTP cache), libraries are versioned and may come from cache */
