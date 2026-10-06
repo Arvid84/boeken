@@ -79,14 +79,19 @@ h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-item
 .play svg{width:22px;height:22px}
 .empty{color:var(--fg2);text-align:center;padding:28px 20px;background:var(--card);border-radius:22px}
 /* covers */
+/* every cover sits in a slot of fixed shape; the cover itself keeps its real shape, bottom-aligned like books on a shelf */
+.slot{position:relative;display:flex;align-items:flex-end;justify-content:center;max-width:100%}
+.slot>.cover{flex:none}
 .cover{aspect-ratio:2/3;border-radius:10px;overflow:hidden;position:relative;background:var(--card2);box-shadow:0 2px 10px rgba(0,0,0,.18);max-width:100%}
+.ctr{position:absolute;inset:0;z-index:1;transform-origin:50% 50%}
 .cover img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;display:block;background:var(--card2)}
 .cover .ph[data-hide]{visibility:hidden}
 .cover .ph{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:10% 9%;color:#fff;font-weight:700;line-height:1.15}
 .cover .ph .pt{font-size:clamp(11px,3.3vw,16px);overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;font-family:Georgia,"Times New Roman",serif}
 .cover .ph .pa{font-size:clamp(9px,2.4vw,12px);font-weight:500;opacity:.85}
 .ced{display:flex;justify-content:center;padding:4px 0 2px}
-.ced-frame{width:min(62vw,270px);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.ced-slot{width:min(72vw,300px);align-items:center}
+.ced-frame{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .ced-frame:active{cursor:grabbing}
 .ced-frame img{pointer-events:none;background:transparent}
 .ced-grid{position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);
@@ -97,7 +102,7 @@ h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-item
 .ced-ctl b{flex:none;width:56px;text-align:right;font-weight:500;color:var(--fg2);font-variant-numeric:tabular-nums;font-size:15px}
 .ced-ctl input[type=range]{flex:1;min-width:0;accent-color:var(--accent)}
 .editable{cursor:pointer}
-.badge{position:absolute;right:6px;bottom:6px;width:28px;height:28px;border-radius:50%;background:rgba(30,30,30,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;color:#fff}
+.badge{z-index:3;position:absolute;right:6px;bottom:6px;width:28px;height:28px;border-radius:50%;background:rgba(30,30,30,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;color:#fff}
 .badge svg{width:15px;height:15px}
 .badge.fav{left:6px;right:auto;color:#ff6482}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 12px}
@@ -113,10 +118,11 @@ h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-item
 .hero{position:relative;margin:-8px -16px 0;padding:calc(env(safe-area-inset-top,0px) + 70px) 16px 26px;text-align:center;overflow:hidden;color:#fff}
 .hero .bgimg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(40px) saturate(1.3) brightness(.8);transform:scale(1.3)}
 .hero>*:not(.bgimg){position:relative}
-.hero .cover{width:46%;max-width:220px;margin:0 auto;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.hero .hslot{width:min(64vw,280px);margin:0 auto}
+.hero .cover{border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
 .hero h1{font-size:25px;line-height:1.2;margin:20px 0 6px;text-wrap:balance}
 .hero .au{opacity:.85;font-size:18px}
-.pagechip{position:absolute;right:8px;bottom:8px;background:rgba(60,60,60,.75);color:#fff;font-size:13px;padding:4px 10px;border-radius:12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.pagechip{z-index:3;position:absolute;right:8px;bottom:8px;background:rgba(60,60,60,.75);color:#fff;font-size:13px;padding:4px 10px;border-radius:12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .actions{display:flex;justify-content:center;gap:30px;margin-top:22px}
 .act{display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:600;font-size:15px;color:#fff}
 .act span.c{width:66px;height:66px;border-radius:50%;background:rgba(255,255,255,.25);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center}
@@ -161,7 +167,8 @@ h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-item
 .reader>*:not(.bgimg){position:relative}
 .reader .top{width:100%;display:flex;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 0}
 .reader .top .pill{color:#fff;background:rgba(255,255,255,.2)}
-.reader .cover{width:min(52vw,250px);margin-top:6vh;border-radius:18px}
+.reader .rslot{width:min(62vw,280px);margin-top:6vh}
+.reader .cover{border-radius:16px}
 .reader .goal{margin-top:5vh;display:flex;align-items:center;gap:10px;font-size:22px;font-weight:600}
 .reader .goal svg{width:28px;height:28px}
 .reader .time{font:200 min(24vw,110px)/1 var(--round);font-variant-numeric:tabular-nums;margin-top:8px;letter-spacing:-1px}
@@ -176,7 +183,7 @@ h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-item
 .scanner .top .pill{color:#fff;background:rgba(255,255,255,.2)}
 .scanner .panel{position:relative;margin-top:auto;background:var(--bg);color:var(--fg);border-radius:28px 28px 0 0;padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 16px);max-height:48vh;overflow:auto}
 .scanned{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:.5px solid var(--sep)}
-.scanned .cover{width:44px;flex:none;border-radius:6px}
+.scanned .slot{width:44px;flex:none}.scanned .cover{border-radius:6px}
 .scanned .m{flex:1;min-width:0;font-size:15px}
 .scanned .m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dup{color:var(--red);font-size:13px;font-weight:600}
@@ -184,6 +191,7 @@ h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-item
 /* cover search */
 .cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .cgrid button{position:relative}
+.cgrid .cover{background:transparent;box-shadow:none}.cgrid .cover img{object-fit:contain;background:transparent}
 .cgrid .src{font-size:11px;color:var(--fg2);margin-top:4px;text-align:center}
 .paste{border:1.5px dashed var(--fg3);border-radius:18px;padding:18px;text-align:center;color:var(--fg2);margin-top:12px;outline:none}
 .paste:focus{border-color:var(--accent)}
@@ -207,7 +215,7 @@ h2.sec{font-size:22px;font-weight:700;margin:26px 0 10px;display:flex;align-item
 @keyframes spin{to{transform:rotate(360deg)}}
 .result{display:flex;gap:12px;align-items:center;padding:10px 16px;width:100%;text-align:left}
 .result+.result{border-top:.5px solid var(--sep)}
-.result .cover{width:46px;flex:none;border-radius:6px}
+.result .slot{width:46px;flex:none}.result .cover{border-radius:6px}
 .result .m{flex:1;min-width:0}
 .result .m b{display:block;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .result .m span{color:var(--fg2);font-size:14px}
@@ -256,8 +264,8 @@ const I={
 
 /* ---------- i18n ---------- */
 const STR={
-nl:{library:"Boekenplank",nowReading:"Leest nu",collection:"Bibliotheek",all:"Alle boeken",wishlist:"Verlanglijst",toread:"Te lezen",reading:"Lezen",finished:"Voltooid",favorites:"Favorieten",nocover:"Zonder cover",adjustCover:"Cover aanpassen",zoom:"Schaal",rotation:"Rotatie",reset:"Herstel",cedHint:"Sleep om te verschuiven. Knijp met twee vingers om te schalen en draai ze om te roteren.",importing:"Importeren…",coversBusy:"Covers worden al opgehaald",sources:"Bronnen",gbKey:"Google Books API-sleutel (optioneel)",gbKeyHint:"Covers komen uit Open Library, Amazon, Goodreads (via BookCover API), Apple Books en Google Books. Google Books werkt alleen betrouwbaar met een gratis sleutel uit Google Cloud.",gbBuiltin:"Ingebouwde sleutel actief",fetchCovers:"Ontbrekende covers ophalen",coversProgress:"Covers ophalen: {d} van {n} · {f} gevonden",coversDone:"{f} van {n} covers gevonden",coversNone:"Alle boeken hebben al een cover",nocoverHint:"Tik op een boek om direct een cover te kiezen.",coversStopping:"Stoppen…",tapStop:"tik om te stoppen",owned:"Bibliotheek",abandoned:"Verlaten",more:"Meer",collections:"Collecties",collectionsPh:"bijv. In bestelling",importedU:"{n} nieuw, {u} bijgewerkt",importErr:"Dit bestand kon niet gelezen worden. Kies de Bookshelf-zip of de Books-CSV.",books:"Boeken",stats:"Statistieken",settings:"Instellingen",books_n:"boeken",sort:"Sorteren",s_added:"Recent toegevoegd",s_title:"Titel",s_author:"Auteur",s_year:"Jaar van uitgave",searchLib:"Zoek op titel, auteur of ISBN",readMode:"Leesmodus",status:"Status",edit:"Bewerken",progress:"Voortgang",pagesRead:"{a} van {b} pagina's gelezen",noPages:"Geen paginatelling bekend",updatePage:"Pagina bijwerken",details:"Details",isbn:"ISBN",publisher:"Uitgever",year:"Jaar",pages:"Pagina's",format:"Formaat",ownership:"Eigendom",categories:"Categorieën",added:"Toegevoegd",started:"Gestart",ended:"Voltooid op",rating:"Beoordeling",favorite:"Favoriet",notes:"Notities",noNotes:"Nog geen notities",addNote:"Notitie toevoegen",sessions:"Leessessies",deleteBook:"Verwijder boek",confirmDelete:"Dit boek verwijderen?",delete:"Verwijderen",cancel:"Annuleren",save:"Bewaren",title:"Titel",author:"Auteur",cover:"Cover",findCover:"Zoek cover online",addBook:"Boek toevoegen",scan:"Scan barcode",scanSub:"Scan één of meerdere barcodes",searchOnline:"Zoek online",searchOnlineSub:"Op titel, auteur of ISBN",manual:"Handmatig invoeren",manualSub:"Zelf alle gegevens invullen",newBook:"Nieuw boek",hardcover:"Hardcover",paperback:"Paperback",ebook:"E-book",audiobook:"Luisterboek",owned:"In bezit",notOwned:"Niet in bezit",borrowed:"Geleend",scanned:"Gescande boeken",scanHint:"Richt de camera op de barcode op de achterkant",alreadyHave:"Al in je bibliotheek",willAdd:"Nieuw",notFound:"Niet gevonden, wordt toegevoegd met alleen ISBN",addN:"Toevoegen ({n})",cameraErr:"Camera niet beschikbaar. Geef toegang in Instellingen > Safari > Camera.",goal:"{n}m tot doel",goalDone:"Dagdoel gehaald",pause:"Pauze",resume:"Hervat",finish:"Voltooien",untilPage:"Tot welke pagina heb je gelezen?",markFinished:"Markeer als voltooid?",yes:"Ja",no:"Nee",playlist:"Playlist",openPlaylist:"Open playlist",coverSearch:"Cover zoeken",googleImages:"Zoek op Google Afbeeldingen",pasteHint:"Houd een afbeelding ingedrukt in Safari, kies 'Kopieer' en tik hier op 'Plak'",pasteHere:"Tik hier en kies Plak",choosePhoto:"Kies foto of maak foto",noResults:"Geen resultaten",coverSaved:"Cover opgeslagen",removeCover:"Cover verwijderen",language:"Taal",auto:"Automatisch",dailyGoal:"Dagdoel lezen (minuten)",playlistUrl:"Playlist-link (Spotify of Apple Music)",playlistHint:"Plak de deel-link van een playlist. Bij het starten van de leesmodus kun je die met één tik openen.",appearance:"Weergave",system:"Systeem",light:"Licht",dark:"Donker",data:"Gegevens",importCsv:"Importeer Bookshelf-export (zip of CSV)",exportJson:"Maak back-up (JSON)",importJson:"Zet back-up terug",deleteAll:"Wis alle gegevens",confirmDeleteAll:"Alle boeken en sessies wissen? Dit kan niet ongedaan worden.",imported:"{n} boeken geïmporteerd, {d} dubbel overgeslagen",emptyLib:"Je bibliotheek is nog leeg",emptyHint:"Importeer je Bookshelf-export of voeg je eerste boek toe.",loadSeed:"Laad mijn export (mrt 2026)",nothingReading:"Je leest nu niets. Open een boek en tik op Leesmodus.",yearBooks:"Boeken voltooid in {y}",yearPages:"Pagina's gelezen in {y}",totalTime:"Totale leestijd",streak:"Leesreeks (dagen)",last7:"Leestijd afgelopen 7 dagen",perMonth:"Voltooid per maand in {y}",min:"min",saved:"Opgeslagen",progressSaved:"Voortgang opgeslagen",backupMade:"Back-up gemaakt",lookup:"Opzoeken…",searchBtn:"Zoek",noTitle:"Zonder titel",unknownAuthor:"Onbekende auteur",sessionSaved:"Sessie van {m} min opgeslagen",install:"Zet op beginscherm: tik op Deel en kies 'Zet op beginscherm'.",duplicateWarn:"Je hebt dit boek al",openExisting:"Open bestaande",addAnyway:"Toch toevoegen",notePh:"Schrijf je notitie…",page:"Pagina",fromPage:"Vanaf pagina {n}",about:"Over",version:"Versie"},
-en:{library:"Bookshelf",nowReading:"Now Reading",collection:"Library",all:"All Books",wishlist:"Wishlist",toread:"To Read",reading:"Reading",finished:"Finished",favorites:"Favorites",nocover:"No cover",adjustCover:"Adjust cover",zoom:"Scale",rotation:"Rotation",reset:"Reset",cedHint:"Drag to move. Pinch with two fingers to scale and twist them to rotate.",importing:"Importing…",coversBusy:"Already fetching covers",sources:"Sources",gbKey:"Google Books API key (optional)",gbKeyHint:"Covers come from Open Library, Amazon, Goodreads (via BookCover API), Apple Books and Google Books. Google Books only works reliably with a free key from Google Cloud.",gbBuiltin:"Built-in key active",fetchCovers:"Fetch missing covers",coversProgress:"Fetching covers: {d} of {n} · {f} found",coversDone:"{f} of {n} covers found",coversNone:"All books already have a cover",nocoverHint:"Tap a book to pick a cover straight away.",coversStopping:"Stopping…",tapStop:"tap to stop",owned:"Library",abandoned:"Abandoned",more:"More",collections:"Collections",collectionsPh:"e.g. On order",importedU:"{n} new, {u} updated",importErr:"This file could not be read. Choose the Bookshelf zip or the Books CSV.",books:"Books",stats:"Statistics",settings:"Settings",books_n:"books",sort:"Sort",s_added:"Recently added",s_title:"Title",s_author:"Author",s_year:"Publication year",searchLib:"Search title, author or ISBN",readMode:"Reading Mode",status:"Status",edit:"Edit",progress:"Progress",pagesRead:"{a} of {b} pages read",noPages:"Page count unknown",updatePage:"Update page",details:"Details",isbn:"ISBN",publisher:"Publisher",year:"Year",pages:"Pages",format:"Format",ownership:"Ownership",categories:"Categories",added:"Added",started:"Started",ended:"Finished on",rating:"Rating",favorite:"Favorite",notes:"Notes",noNotes:"No notes yet",addNote:"Add note",sessions:"Reading sessions",deleteBook:"Delete book",confirmDelete:"Delete this book?",delete:"Delete",cancel:"Cancel",save:"Save",title:"Title",author:"Author",cover:"Cover",findCover:"Find cover online",addBook:"Add book",scan:"Scan barcode",scanSub:"Scan one or more barcodes",searchOnline:"Search online",searchOnlineSub:"By title, author or ISBN",manual:"Enter manually",manualSub:"Fill in all details yourself",newBook:"New book",hardcover:"Hardcover",paperback:"Paperback",ebook:"E-book",audiobook:"Audiobook",owned:"Owned",notOwned:"Not owned",borrowed:"Borrowed",scanned:"Scanned books",scanHint:"Point the camera at the barcode on the back",alreadyHave:"Already in your library",willAdd:"New",notFound:"Not found, will be added with ISBN only",addN:"Add ({n})",cameraErr:"Camera unavailable. Allow access in Settings > Safari > Camera.",goal:"{n}m to goal",goalDone:"Daily goal reached",pause:"Pause",resume:"Resume",finish:"Finish",untilPage:"Which page did you read up to?",markFinished:"Mark as finished?",yes:"Yes",no:"No",playlist:"Playlist",openPlaylist:"Open playlist",coverSearch:"Find cover",googleImages:"Search Google Images",pasteHint:"Long-press an image in Safari, choose 'Copy' and tap 'Paste' here",pasteHere:"Tap here and choose Paste",choosePhoto:"Choose or take photo",noResults:"No results",coverSaved:"Cover saved",removeCover:"Remove cover",language:"Language",auto:"Automatic",dailyGoal:"Daily reading goal (minutes)",playlistUrl:"Playlist link (Spotify or Apple Music)",playlistHint:"Paste a playlist share link. When you start reading mode you can open it with one tap.",appearance:"Appearance",system:"System",light:"Light",dark:"Dark",data:"Data",importCsv:"Import Bookshelf export (zip or CSV)",exportJson:"Make backup (JSON)",importJson:"Restore backup",deleteAll:"Erase all data",confirmDeleteAll:"Erase all books and sessions? This cannot be undone.",imported:"{n} books imported, {d} duplicates skipped",emptyLib:"Your library is empty",emptyHint:"Import your Bookshelf export or add your first book.",loadSeed:"Load my export (Mar 2026)",nothingReading:"You're not reading anything. Open a book and tap Reading Mode.",yearBooks:"Books finished in {y}",yearPages:"Pages read in {y}",totalTime:"Total reading time",streak:"Reading streak (days)",last7:"Reading time, last 7 days",perMonth:"Finished per month in {y}",min:"min",saved:"Saved",progressSaved:"Progress saved",backupMade:"Backup created",lookup:"Looking up…",searchBtn:"Search",noTitle:"Untitled",unknownAuthor:"Unknown author",sessionSaved:"{m} min session saved",install:"Add to Home Screen: tap Share and choose 'Add to Home Screen'.",duplicateWarn:"You already have this book",openExisting:"Open existing",addAnyway:"Add anyway",notePh:"Write your note…",page:"Page",fromPage:"From page {n}",about:"About",version:"Version"}
+nl:{library:"Boekenplank",nowReading:"Leest nu",collection:"Bibliotheek",all:"Alle boeken",wishlist:"Verlanglijst",toread:"Te lezen",reading:"Lezen",finished:"Voltooid",favorites:"Favorieten",nocover:"Zonder cover",adjustCover:"Cover aanpassen",shape:"Vorm",shapeAuto:"Automatisch",shapePortrait:"Staand",shapeSquare:"Vierkant",shapeLandscape:"Liggend",zoom:"Schaal",rotation:"Rotatie",reset:"Herstel",cedHint:"Sleep om te verschuiven. Knijp met twee vingers om te schalen en draai ze om te roteren.",importing:"Importeren…",coversBusy:"Covers worden al opgehaald",sources:"Bronnen",gbKey:"Google Books API-sleutel (optioneel)",gbKeyHint:"Covers komen uit Open Library, Amazon, Goodreads (via BookCover API), Apple Books en Google Books. Google Books werkt alleen betrouwbaar met een gratis sleutel uit Google Cloud.",gbBuiltin:"Ingebouwde sleutel actief",fetchCovers:"Ontbrekende covers ophalen",coversProgress:"Covers ophalen: {d} van {n} · {f} gevonden",coversDone:"{f} van {n} covers gevonden",coversNone:"Alle boeken hebben al een cover",nocoverHint:"Tik op een boek om direct een cover te kiezen.",coversStopping:"Stoppen…",tapStop:"tik om te stoppen",owned:"Bibliotheek",abandoned:"Verlaten",more:"Meer",collections:"Collecties",collectionsPh:"bijv. In bestelling",importedU:"{n} nieuw, {u} bijgewerkt",importErr:"Dit bestand kon niet gelezen worden. Kies de Bookshelf-zip of de Books-CSV.",books:"Boeken",stats:"Statistieken",settings:"Instellingen",books_n:"boeken",sort:"Sorteren",s_added:"Recent toegevoegd",s_title:"Titel",s_author:"Auteur",s_year:"Jaar van uitgave",searchLib:"Zoek op titel, auteur of ISBN",readMode:"Leesmodus",status:"Status",edit:"Bewerken",progress:"Voortgang",pagesRead:"{a} van {b} pagina's gelezen",noPages:"Geen paginatelling bekend",updatePage:"Pagina bijwerken",details:"Details",isbn:"ISBN",publisher:"Uitgever",year:"Jaar",pages:"Pagina's",format:"Formaat",ownership:"Eigendom",categories:"Categorieën",added:"Toegevoegd",started:"Gestart",ended:"Voltooid op",rating:"Beoordeling",favorite:"Favoriet",notes:"Notities",noNotes:"Nog geen notities",addNote:"Notitie toevoegen",sessions:"Leessessies",deleteBook:"Verwijder boek",confirmDelete:"Dit boek verwijderen?",delete:"Verwijderen",cancel:"Annuleren",save:"Bewaren",title:"Titel",author:"Auteur",cover:"Cover",findCover:"Zoek cover online",addBook:"Boek toevoegen",scan:"Scan barcode",scanSub:"Scan één of meerdere barcodes",searchOnline:"Zoek online",searchOnlineSub:"Op titel, auteur of ISBN",manual:"Handmatig invoeren",manualSub:"Zelf alle gegevens invullen",newBook:"Nieuw boek",hardcover:"Hardcover",paperback:"Paperback",ebook:"E-book",audiobook:"Luisterboek",owned:"In bezit",notOwned:"Niet in bezit",borrowed:"Geleend",scanned:"Gescande boeken",scanHint:"Richt de camera op de barcode op de achterkant",alreadyHave:"Al in je bibliotheek",willAdd:"Nieuw",notFound:"Niet gevonden, wordt toegevoegd met alleen ISBN",addN:"Toevoegen ({n})",cameraErr:"Camera niet beschikbaar. Geef toegang in Instellingen > Safari > Camera.",goal:"{n}m tot doel",goalDone:"Dagdoel gehaald",pause:"Pauze",resume:"Hervat",finish:"Voltooien",untilPage:"Tot welke pagina heb je gelezen?",markFinished:"Markeer als voltooid?",yes:"Ja",no:"Nee",playlist:"Playlist",openPlaylist:"Open playlist",coverSearch:"Cover zoeken",googleImages:"Zoek op Google Afbeeldingen",pasteHint:"Houd een afbeelding ingedrukt in Safari, kies 'Kopieer' en tik hier op 'Plak'",pasteHere:"Tik hier en kies Plak",choosePhoto:"Kies foto of maak foto",noResults:"Geen resultaten",coverSaved:"Cover opgeslagen",removeCover:"Cover verwijderen",language:"Taal",auto:"Automatisch",dailyGoal:"Dagdoel lezen (minuten)",playlistUrl:"Playlist-link (Spotify of Apple Music)",playlistHint:"Plak de deel-link van een playlist. Bij het starten van de leesmodus kun je die met één tik openen.",appearance:"Weergave",system:"Systeem",light:"Licht",dark:"Donker",data:"Gegevens",importCsv:"Importeer Bookshelf-export (zip of CSV)",exportJson:"Maak back-up (JSON)",importJson:"Zet back-up terug",deleteAll:"Wis alle gegevens",confirmDeleteAll:"Alle boeken en sessies wissen? Dit kan niet ongedaan worden.",imported:"{n} boeken geïmporteerd, {d} dubbel overgeslagen",emptyLib:"Je bibliotheek is nog leeg",emptyHint:"Importeer je Bookshelf-export of voeg je eerste boek toe.",loadSeed:"Laad mijn export (mrt 2026)",nothingReading:"Je leest nu niets. Open een boek en tik op Leesmodus.",yearBooks:"Boeken voltooid in {y}",yearPages:"Pagina's gelezen in {y}",totalTime:"Totale leestijd",streak:"Leesreeks (dagen)",last7:"Leestijd afgelopen 7 dagen",perMonth:"Voltooid per maand in {y}",min:"min",saved:"Opgeslagen",progressSaved:"Voortgang opgeslagen",backupMade:"Back-up gemaakt",lookup:"Opzoeken…",searchBtn:"Zoek",noTitle:"Zonder titel",unknownAuthor:"Onbekende auteur",sessionSaved:"Sessie van {m} min opgeslagen",install:"Zet op beginscherm: tik op Deel en kies 'Zet op beginscherm'.",duplicateWarn:"Je hebt dit boek al",openExisting:"Open bestaande",addAnyway:"Toch toevoegen",notePh:"Schrijf je notitie…",page:"Pagina",fromPage:"Vanaf pagina {n}",about:"Over",version:"Versie"},
+en:{library:"Bookshelf",nowReading:"Now Reading",collection:"Library",all:"All Books",wishlist:"Wishlist",toread:"To Read",reading:"Reading",finished:"Finished",favorites:"Favorites",nocover:"No cover",adjustCover:"Adjust cover",shape:"Shape",shapeAuto:"Automatic",shapePortrait:"Portrait",shapeSquare:"Square",shapeLandscape:"Landscape",zoom:"Scale",rotation:"Rotation",reset:"Reset",cedHint:"Drag to move. Pinch with two fingers to scale and twist them to rotate.",importing:"Importing…",coversBusy:"Already fetching covers",sources:"Sources",gbKey:"Google Books API key (optional)",gbKeyHint:"Covers come from Open Library, Amazon, Goodreads (via BookCover API), Apple Books and Google Books. Google Books only works reliably with a free key from Google Cloud.",gbBuiltin:"Built-in key active",fetchCovers:"Fetch missing covers",coversProgress:"Fetching covers: {d} of {n} · {f} found",coversDone:"{f} of {n} covers found",coversNone:"All books already have a cover",nocoverHint:"Tap a book to pick a cover straight away.",coversStopping:"Stopping…",tapStop:"tap to stop",owned:"Library",abandoned:"Abandoned",more:"More",collections:"Collections",collectionsPh:"e.g. On order",importedU:"{n} new, {u} updated",importErr:"This file could not be read. Choose the Bookshelf zip or the Books CSV.",books:"Books",stats:"Statistics",settings:"Settings",books_n:"books",sort:"Sort",s_added:"Recently added",s_title:"Title",s_author:"Author",s_year:"Publication year",searchLib:"Search title, author or ISBN",readMode:"Reading Mode",status:"Status",edit:"Edit",progress:"Progress",pagesRead:"{a} of {b} pages read",noPages:"Page count unknown",updatePage:"Update page",details:"Details",isbn:"ISBN",publisher:"Publisher",year:"Year",pages:"Pages",format:"Format",ownership:"Ownership",categories:"Categories",added:"Added",started:"Started",ended:"Finished on",rating:"Rating",favorite:"Favorite",notes:"Notes",noNotes:"No notes yet",addNote:"Add note",sessions:"Reading sessions",deleteBook:"Delete book",confirmDelete:"Delete this book?",delete:"Delete",cancel:"Cancel",save:"Save",title:"Title",author:"Author",cover:"Cover",findCover:"Find cover online",addBook:"Add book",scan:"Scan barcode",scanSub:"Scan one or more barcodes",searchOnline:"Search online",searchOnlineSub:"By title, author or ISBN",manual:"Enter manually",manualSub:"Fill in all details yourself",newBook:"New book",hardcover:"Hardcover",paperback:"Paperback",ebook:"E-book",audiobook:"Audiobook",owned:"Owned",notOwned:"Not owned",borrowed:"Borrowed",scanned:"Scanned books",scanHint:"Point the camera at the barcode on the back",alreadyHave:"Already in your library",willAdd:"New",notFound:"Not found, will be added with ISBN only",addN:"Add ({n})",cameraErr:"Camera unavailable. Allow access in Settings > Safari > Camera.",goal:"{n}m to goal",goalDone:"Daily goal reached",pause:"Pause",resume:"Resume",finish:"Finish",untilPage:"Which page did you read up to?",markFinished:"Mark as finished?",yes:"Yes",no:"No",playlist:"Playlist",openPlaylist:"Open playlist",coverSearch:"Find cover",googleImages:"Search Google Images",pasteHint:"Long-press an image in Safari, choose 'Copy' and tap 'Paste' here",pasteHere:"Tap here and choose Paste",choosePhoto:"Choose or take photo",noResults:"No results",coverSaved:"Cover saved",removeCover:"Remove cover",language:"Language",auto:"Automatic",dailyGoal:"Daily reading goal (minutes)",playlistUrl:"Playlist link (Spotify or Apple Music)",playlistHint:"Paste a playlist share link. When you start reading mode you can open it with one tap.",appearance:"Appearance",system:"System",light:"Light",dark:"Dark",data:"Data",importCsv:"Import Bookshelf export (zip or CSV)",exportJson:"Make backup (JSON)",importJson:"Restore backup",deleteAll:"Erase all data",confirmDeleteAll:"Erase all books and sessions? This cannot be undone.",imported:"{n} books imported, {d} duplicates skipped",emptyLib:"Your library is empty",emptyHint:"Import your Bookshelf export or add your first book.",loadSeed:"Load my export (Mar 2026)",nothingReading:"You're not reading anything. Open a book and tap Reading Mode.",yearBooks:"Books finished in {y}",yearPages:"Pages read in {y}",totalTime:"Total reading time",streak:"Reading streak (days)",last7:"Reading time, last 7 days",perMonth:"Finished per month in {y}",min:"min",saved:"Saved",progressSaved:"Progress saved",backupMade:"Backup created",lookup:"Looking up…",searchBtn:"Search",noTitle:"Untitled",unknownAuthor:"Unknown author",sessionSaved:"{m} min session saved",install:"Add to Home Screen: tap Share and choose 'Add to Home Screen'.",duplicateWarn:"You already have this book",openExisting:"Open existing",addAnyway:"Add anyway",notePh:"Write your note…",page:"Page",fromPage:"From page {n}",about:"About",version:"Version"}
 };
 let LANG="nl";
 function t(k,v){let s=(STR[LANG]&&STR[LANG][k])||STR.nl[k]||k;if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s}
@@ -317,7 +325,7 @@ function mergeImport(existing,rows,history,collections){
       if(!b.rating)b.rating=Math.round(parseFloat(h.Rating)||0);b.start=b.start||parseDate(h["Start Date"]);b.end=b.end||parseDate(h["End Date"])}
     const c=cols[b.srcId]||[];if(c.includes("Geleend"))b.owned="borrowed";b.collections=c.filter(x=>x!=="Geleend");
     let d=(b.srcId&&pool.find(x=>x.srcId===b.srcId))||findDuplicate(pool,b);
-    if(d){pool.splice(pool.indexOf(d),1);const keep={id:d.id,cover:d.cover,coverT:d.coverT,notes:d.notes||[],sessions:d.sessions||[],lastRead:d.lastRead};
+    if(d){pool.splice(pool.indexOf(d),1);const keep={id:d.id,cover:d.cover,coverT:d.coverT,coverAR:d.coverAR,coverShape:d.coverShape,notes:d.notes||[],sessions:d.sessions||[],lastRead:d.lastRead};
       if((d.sessions||[]).length&&d.progress>b.progress)keep.progress=d.progress;Object.assign(d,b,keep);updated.push(d)}
     else added.push(b)}
   return {added,updated}}
@@ -360,14 +368,36 @@ async function saveBook(b){const i=S.books.findIndex(x=>x.id===b.id);if(i<0)S.bo
 /* ---------- cover rendering ---------- */
 const PALS=[["#5b3a8c","#2b1b47"],["#1f5f8b","#0e2c42"],["#8b2f3c","#3f141b"],["#2f6b4f","#123224"],["#8a6a1f","#3d2e0b"],["#3d4a8c","#1a2047"],["#7a3d6b","#36192f"],["#2d6a73","#0f2f33"]];
 function hash(s){let h=0;for(const c of s||"")h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)}
-function coverTransform(T){return `transform:translate(${T.x}%,${T.y}%) rotate(${T.r}deg) scale(${T.s})`}
-function setCover(b,u){b.cover=u;delete b.coverT;delete b.coverTried}
-function coverHTML(b,cls=""){const p=PALS[hash(b.title)%PALS.length];
-  const tr=b.cover&&b.coverT;
-  const ph=`<div class="ph"${tr?" data-hide":""} style="background:linear-gradient(160deg,${p[0]},${p[1]})"><div class="pt">${esc(b.title||t("noTitle"))}</div><div class="pa">${esc(b.author)}</div></div>`;
-  const fail="var p=this.parentNode.querySelector('.ph');if(p)p.removeAttribute('data-hide');this.remove()";
-  const img=b.cover?`<img src="${esc(b.cover)}" alt="" loading="lazy"${tr?` style="${coverTransform(b.coverT)}"`:""} onerror="${fail}" onload="if(this.naturalWidth<10){${fail}}">`:"";
-  return `<div class="cover ${cls}">${ph}${img}</div>`}
+const SHAPES={portrait:2/3,square:1,landscape:3/2};
+const clampAR=a=>Math.min(2.2,Math.max(0.45,a));
+/* transform: s scale, x/y shift in % of the frame, q quarter turns (90° buttons), r free angle */
+function normT(T){if(!T)return null;let q=T.q,r=T.r||0;if(q==null){q=Math.round(r/90);r-=q*90}q=((q%4)+4)%4;return {s:T.s||1,x:T.x||0,y:T.y||0,r,q}}
+const isIdT=T=>!T||(T.s===1&&!T.x&&!T.y&&!T.r&&!T.q);
+function frameAR(A,shape,T){if(SHAPES[shape])return SHAPES[shape];if(!A)return 2/3;return clampAR(T&&T.q%2?1/A:A)}
+function boxStyle(F,slotR){const w=F>=slotR?100:F/slotR*100;return `width:${+w.toFixed(3)}%;aspect-ratio:${+F.toFixed(4)}`}
+/* image keeps its own proportions and covers the frame at scale 1 (for the 90°-turned orientation too) */
+function imgGeom(A,F,T){const side=T&&T.q%2===1,Ap=side?1/A:A;let aw,ah;if(Ap>F){ah=1;aw=Ap}else{aw=F;ah=F/Ap}
+  const ew=side?ah:aw,eh=side?aw:ah,f=v=>+v.toFixed(3);
+  return `left:${f((F-ew)/2/F*100)}%;top:${f((1-eh)/2*100)}%;right:auto;bottom:auto;width:${f(ew/F*100)}%;height:${f(eh*100)}%;object-fit:fill`}
+function coverTransform(T){return `transform:translate(${T.x}%,${T.y}%) rotate(${T.q*90+T.r}deg) scale(${T.s})`}
+function applyCoverEdit(b,T,sh){if(T)b.coverT=T;else delete b.coverT;if(sh&&sh!=="auto")b.coverShape=sh;else delete b.coverShape}
+function setCover(b,u){b.cover=u;delete b.coverT;delete b.coverTried;delete b.coverAR;delete b.coverShape}
+let arDirty=new Set(),arTimer=null;
+function saveARSoon(b){arDirty.add(b);clearTimeout(arTimer);arTimer=setTimeout(()=>{const l=[...arDirty];arDirty.clear();DB.putMany(l).catch(()=>{})},1200)}
+function coverLoaded(img){if(img.naturalWidth<10)return coverFail(img);const box=img.closest(".cover");if(!box||box.dataset.fixed)return;
+  const A=img.naturalWidth/img.naturalHeight,id=box.dataset.id;
+  if(id){const b=byId(id);if(b&&b.cover&&Math.abs((b.coverAR||0)-A)>0.004){b.coverAR=A;saveARSoon(b)}}
+  const T=box.dataset.t?JSON.parse(box.dataset.t):null,F=frameAR(A,box.dataset.shape,T);
+  box.style.cssText=boxStyle(F,+box.dataset.sr||2/3);if(T)img.style.cssText=imgGeom(A,F,T)}
+function coverFail(img){const box=img.closest(".cover");if(!box)return;const ph=box.querySelector(".ph");if(ph)ph.removeAttribute("data-hide");
+  (img.closest(".ctr")||img).remove();box.style.cssText=boxStyle(2/3,+box.dataset.sr||2/3)}
+function coverHTML(b,opt){if(typeof opt==="string")opt={cls:opt};opt=opt||{};const slotR=opt.slot||2/3;const p=PALS[hash(b.title)%PALS.length];
+  const has=!!b.cover,T=has?normT(b.coverT):null,shape=has?(b.coverShape||"auto"):"auto",A=has?b.coverAR:0,F=has?frameAR(A,shape,T):2/3;
+  const ph=`<div class="ph"${T?" data-hide":""} style="background:linear-gradient(160deg,${p[0]},${p[1]})"><div class="pt">${esc(b.title||t("noTitle"))}</div><div class="pa">${esc(b.author)}</div></div>`;
+  let img="";if(has){const ev='onload="coverLoaded(this)" onerror="coverFail(this)"';
+    img=T?`<div class="ctr" style="${coverTransform(T)}"><img src="${esc(b.cover)}" alt="" loading="lazy"${A?` style="${imgGeom(A,F,T)}"`:""} ${ev}></div>`
+         :`<img src="${esc(b.cover)}" alt="" loading="lazy" ${ev}>`}
+  return `<div class="slot ${opt.cls||""}" style="aspect-ratio:${+slotR.toFixed(4)}"><div class="cover" style="${boxStyle(F,slotR)}" data-sr="${+slotR.toFixed(4)}" data-shape="${shape}"${T?` data-t="${esc(JSON.stringify(T))}"`:""}${b.id&&byId(b.id)?` data-id="${b.id}"`:""}>${ph}${img}${opt.extra||""}</div></div>`}
 function bgStyle(b){return b.cover?`style="background-image:url('${esc(b.cover).replace(/'/g,"%27")}')"`:`style="background:linear-gradient(160deg,${PALS[hash(b.title)%PALS.length].join(",")})"`}
 
 /* ---------- navigation ---------- */
@@ -414,7 +444,7 @@ function vList(p){
   <div class="search">${I.search}<input id="q" type="search" placeholder="${t("searchLib")}" value="${esc(S.q)}" autocomplete="off"></div>
   <div class="toolbar"><span>${list.length} ${t("books_n")}</span><button data-a="sort">${t("sort")} ${I.sort.replace("<svg","<svg width=16 height=16")}</button></div>
   ${p.f==="nocover"&&list.length?`<button class="btn blue" style="width:100%;margin-bottom:14px" data-a="fetchcovers">${t("fetchCovers")}</button><p class="hint" style="margin:-6px 4px 14px">${t("nocoverHint")}</p>`:""}<div class="grid" id="grid">${gridHTML(list,p.f==="nocover"?"quickcover":"open")}</div>`}
-function gridHTML(list,act="open"){return list.map(b=>`<button data-a="${act}" data-id="${b.id}" aria-label="${esc(b.title)}"><div style="position:relative">${coverHTML(b)}${b.status==="finished"?`<span class="badge">${I.check}</span>`:""}${b.favorite?`<span class="badge fav">${I.heart}</span>`:""}</div><div class="gt">${esc(b.title)}</div></button>`).join("")||`<p style="color:var(--fg2);grid-column:1/-1">${t("noResults")}</p>`}
+function gridHTML(list,act="open"){return list.map(b=>`<button data-a="${act}" data-id="${b.id}" aria-label="${esc(b.title)}">${coverHTML(b,{extra:(b.status==="finished"?`<span class="badge">${I.check}</span>`:"")+(b.favorite?`<span class="badge fav">${I.heart}</span>`:"")})}<div class="gt">${esc(b.title)}</div></button>`).join("")||`<p style="color:var(--fg2);grid-column:1/-1">${t("noResults")}</p>`}
 
 function ring(pct){const r=30,c=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 72 72"><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--card2)" stroke-width="8"/><circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct/100)}" transform="rotate(-90 36 36)"/><text x="36" y="41" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">${Math.round(pct)}%</text></svg>`}
 function vDetail(p){const b=byId(p.id);if(!b)return vHome();
@@ -423,7 +453,7 @@ function vDetail(p){const b=byId(p.id);if(!b)return vHome();
   const row=(l,v)=>`<div class="row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`;
   return `<div class="hero"><div class="bgimg" ${bgStyle(b)}></div>
    <button class="pill icon back" data-a="back" aria-label="Back">${I.back}</button><button class="pill icon more" data-a="bookmenu" data-id="${b.id}" aria-label="Menu">${I.more}</button>
-   <div style="position:relative;width:46%;max-width:220px;margin:0 auto"${b.cover?` class="editable" data-a="editcover" data-id="${b.id}" role="button" aria-label="${t("adjustCover")}"`:""}>${coverHTML(b).replace('class="cover "','class="cover " style="width:100%;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.35)"')}${b.status==="reading"?`<span class="pagechip">${t("page")} ${b.progress||0}</span>`:""}</div>
+   <div${b.cover?` class="editable" data-a="editcover" data-id="${b.id}" role="button" aria-label="${t("adjustCover")}"`:""}>${coverHTML(b,{cls:"hslot",slot:1,extra:b.status==="reading"?`<span class="pagechip">${t("page")} ${b.progress||0}</span>`:""})}</div>
    <h1>${esc(b.title)}</h1><div class="au">${esc(b.author||t("unknownAuthor"))}</div>
    <div class="actions"><button class="act primary" data-a="read" data-id="${b.id}"><span class="c">${I.play}</span>${t("readMode")}</button>
    <button class="act" data-a="status" data-id="${b.id}"><span class="c">${FICON[b.status]}</span>${t(b.status)}</button>
@@ -493,7 +523,7 @@ function vSettings(){const st=S.settings;
    ${window.SEED_CSV?`<button class="row accent" data-a="seed">${t("loadSeed")}</button>`:""}
    <button class="row" style="color:var(--red)" data-a="deleteall">${t("deleteAll")}</button></div>
   <p class="hint">${t("install")}</p>
-  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.9</p>`}
+  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.10</p>`}
 
 /* ---------- render ---------- */
 function render(){const c=cur();let h="";
@@ -595,22 +625,29 @@ async function coverCandidates(b,query){const c=[];const seen=new Set();const ad
 
 /* ---------- cover editor: scale, move, rotate freely (stored as a transform, re-editable) ---------- */
 function openCoverEditor(b,onSave){
-  const st=Object.assign({s:1,x:0,y:0,r:0},b.coverT||{});
+  const st=normT(b.coverT)||{s:1,x:0,y:0,r:0,q:0};let shape=b.coverShape||"auto",A=b.coverAR||0;
   const clamp=(v,a,z)=>Math.min(z,Math.max(a,v));const norm=r=>{r=((r+180)%360+360)%360-180;return Math.round(r*10)/10};
+  const shapes=[["auto",t("shapeAuto")],["portrait",t("shapePortrait")],["square",t("shapeSquare")],["landscape",t("shapeLandscape")]];
   const w=sheet(`<h3>${t("adjustCover")}</h3>
-   <div class="ced"><div class="cover ced-frame" id="cedf"><img id="cedi" src="${esc(b.cover)}" alt="" draggable="false"><div class="ced-grid"></div></div></div>
+   <div class="ced"><div class="slot ced-slot" style="aspect-ratio:1"><div class="cover ced-frame" id="cedf" data-fixed="1"><div class="ctr" id="cedw"><img id="cedi" src="${esc(b.cover)}" alt="" draggable="false"></div><div class="ced-grid"></div></div></div></div>
    <p class="hint" style="text-align:center;margin:10px 16px 14px">${t("cedHint")}</p>
-   <div class="group">
+   <div class="cap" style="margin-top:4px">${t("shape")}</div>
+   <div class="group"><div class="row"><div class="seg" id="cedsh" style="flex:1">${shapes.map(([v,l])=>`<button data-v="${v}">${l}</button>`).join("")}</div></div></div>
+   <div class="group" style="margin-top:12px">
     <label class="ced-ctl"><span>${t("zoom")}</span><input type="range" id="ceds" min="0.3" max="5" step="0.01"><b id="cedsv"></b></label>
     <label class="ced-ctl"><span>${t("rotation")}</span><input type="range" id="cedr" min="-180" max="180" step="0.1"><b id="cedrv"></b></label></div>
    <div class="btnrow"><button class="btn" id="cedl" aria-label="-90">↺ 90°</button><button class="btn" id="cedrr" aria-label="+90">↻ 90°</button><button class="btn" id="ced0">${t("reset")}</button></div>
    <div class="btnrow"><button class="btn" data-x="0">${t("cancel")}</button><button class="btn blue" data-x="1">${t("save")}</button></div>`,()=>done());
-  const fr=w.querySelector("#cedf"),img=w.querySelector("#cedi"),sS=w.querySelector("#ceds"),sR=w.querySelector("#cedr");
-  const apply=()=>{img.style.transform=`translate(${st.x}%,${st.y}%) rotate(${st.r}deg) scale(${st.s})`;
-    sS.value=st.s;sR.value=norm(st.r);w.querySelector("#cedsv").textContent=Math.round(st.s*100)+"%";w.querySelector("#cedrv").textContent=norm(st.r).toFixed(1)+"°"};
-  sS.oninput=()=>{st.s=+sS.value;apply()};sR.oninput=()=>{st.r=+sR.value;apply()};
-  w.querySelector("#cedl").onclick=()=>{st.r=norm(st.r-90);apply()};w.querySelector("#cedrr").onclick=()=>{st.r=norm(st.r+90);apply()};
-  w.querySelector("#ced0").onclick=()=>{Object.assign(st,{s:1,x:0,y:0,r:0});apply()};
+  const fr=w.querySelector("#cedf"),wrap=w.querySelector("#cedw"),img=w.querySelector("#cedi"),sS=w.querySelector("#ceds"),sR=w.querySelector("#cedr");
+  const total=()=>norm(st.q*90+st.r);
+  const apply=()=>{const F=frameAR(A,shape,st);fr.style.cssText=boxStyle(F,1);wrap.style.cssText=coverTransform(st);if(A)img.style.cssText=imgGeom(A,F,st);
+    sS.value=st.s;sR.value=total();w.querySelector("#cedsv").textContent=Math.round(st.s*100)+"%";w.querySelector("#cedrv").textContent=total().toFixed(1)+"°";
+    w.querySelectorAll("#cedsh button").forEach(x=>x.classList.toggle("on",x.dataset.v===shape))};
+  const measure=()=>{if(img.naturalWidth>10){A=img.naturalWidth/img.naturalHeight;apply()}};img.onload=measure;if(img.complete)measure();
+  w.querySelectorAll("#cedsh button").forEach(x=>x.onclick=()=>{shape=x.dataset.v;apply()});
+  sS.oninput=()=>{st.s=+sS.value;apply()};sR.oninput=()=>{st.r=+sR.value-st.q*90;apply()};
+  w.querySelector("#cedl").onclick=()=>{st.q=(st.q+3)%4;apply()};w.querySelector("#cedrr").onclick=()=>{st.q=(st.q+1)%4;apply()};
+  w.querySelector("#ced0").onclick=()=>{Object.assign(st,{s:1,x:0,y:0,r:0,q:0});shape="auto";apply()};
   /* gestures: one finger moves, two fingers zoom + rotate + move; mouse wheel zooms, shift+wheel rotates */
   const pts=new Map();let g=null;
   const snap=()=>{const p=[...pts.values()],rect=fr.getBoundingClientRect(),base={st:{...st},rect};
@@ -625,12 +662,13 @@ function openCoverEditor(b,onSave){
     apply()});
   const end=e=>{pts.delete(e.pointerId);g=pts.size?snap():null};
   fr.addEventListener("pointerup",end);fr.addEventListener("pointercancel",end);
-  fr.addEventListener("wheel",e=>{e.preventDefault();if(e.shiftKey)st.r=norm(st.r+(e.deltaY||e.deltaX)*0.15);else st.s=clamp(st.s*Math.exp(-e.deltaY*0.0015),0.3,5);apply()},{passive:false});
+  fr.addEventListener("wheel",e=>{e.preventDefault();if(e.shiftKey)st.r+=(e.deltaY||e.deltaX)*0.15;else st.s=clamp(st.s*Math.exp(-e.deltaY*0.0015),0.3,5);apply()},{passive:false});
   const noZoom=e=>e.preventDefault();document.addEventListener("gesturestart",noZoom);document.addEventListener("gesturechange",noZoom);
   function done(){document.removeEventListener("gesturestart",noZoom);document.removeEventListener("gesturechange",noZoom)}
   w.querySelectorAll("[data-x]").forEach(btn=>btn.onclick=()=>{done();w.remove();if(btn.dataset.x!=="1")return;
-    const T={s:Math.round(st.s*1000)/1000,x:Math.round(st.x*100)/100,y:Math.round(st.y*100)/100,r:norm(st.r)};
-    onSave(T.s===1&&!T.x&&!T.y&&!T.r?null:T)});
+    let r=st.r;r=((r+180)%360+360)%360-180;
+    const T={s:Math.round(st.s*1000)/1000,x:Math.round(st.x*100)/100,y:Math.round(st.y*100)/100,r:Math.round(r*10)/10,q:st.q};
+    onSave(isIdT(T)?null:T,shape)});
   apply()}
 
 /* ---------- cover search screen ---------- */
@@ -726,7 +764,7 @@ function showReader(){const s=S.session;const b=byId(s.bookId);if(!b){S.session=
   <div class="top"><button class="pill icon" id="rx" aria-label="${t("cancel")}">${I.close}</button><div style="flex:1"></div>
    ${S.settings.playlist?`<a class="pill" href="${esc(S.settings.playlist)}" target="_blank" rel="noopener" style="color:#fff;background:rgba(255,255,255,.2);text-decoration:none">${I.music}${t("playlist")}</a>`:""}
    <button class="pill" id="rf" style="font-weight:700">${t("finish")}</button></div>
-  <div style="position:relative">${coverHTML(b)}<span class="pagechip">${t("fromPage",{n:b.progress||0})}</span></div>
+  ${coverHTML(b,{cls:"rslot",slot:1,extra:`<span class="pagechip">${t("fromPage",{n:b.progress||0})}</span>`})}
   <div class="goal" id="rgoal"></div><div class="time" id="rtime">0:00</div>
   <div class="ctrls"><button class="act" id="rnote"><span class="c">${I.note}</span>${t("addNote")}</button>
    <button class="act primary" id="rp"><span class="c" id="rpi"></span><span id="rpl"></span></button></div>`;
@@ -811,8 +849,8 @@ document.addEventListener("click",async e=>{const el=e.target.closest("[data-a]"
   case "back":back();break;
   case "list":S.q="";go("list",{f:el.dataset.f});break;
   case "open":go("detail",{id});break;
-  case "editcover":{const b=byId(id);if(b&&b.cover)openCoverEditor(b,async T=>{if(T)b.coverT=T;else delete b.coverT;await saveBook(b);render()});break}
-  case "editcoverdraft":{const c=cur();const b=c.id?byId(c.id):c.draft;readForm(b);if(b.cover)openCoverEditor(b,T=>{if(T)b.coverT=T;else delete b.coverT;render()});break}
+  case "editcover":{const b=byId(id);if(b&&b.cover)openCoverEditor(b,async(T,sh)=>{applyCoverEdit(b,T,sh);await saveBook(b);render()});break}
+  case "editcoverdraft":{const c=cur();const b=c.id?byId(c.id):c.draft;readForm(b);if(b.cover)openCoverEditor(b,(T,sh)=>{applyCoverEdit(b,T,sh);render()});break}
   case "quickcover":{const b=byId(id);openCoverSearch(b,async u=>{setCover(b,u);await saveBook(b);const y=window.scrollY;render();window.scrollTo(0,y)});break}
   case "settings":go("settings");break;
   case "add":addFlow();break;
@@ -822,7 +860,7 @@ document.addEventListener("click",async e=>{const el=e.target.closest("[data-a]"
   case "status":{const b=byId(id);const v=await menuSheet(t("status"),["toread","reading","finished","wishlist","abandoned"].map(k=>({label:t(k),icon:FICON[k],value:k,on:b.status===k})));
     if(v){b.status=v;if(v==="reading"&&!b.start)b.start=new Date().toISOString();if(v==="finished"){b.end=b.end||new Date().toISOString();if(b.pages)b.progress=b.pages}if(v==="wishlist"&&b.owned==="owned")b.owned="notOwned";if(v!=="wishlist"&&b.owned==="notOwned")b.owned="owned";await saveBook(b);render()}break}
   case "bookmenu":{const v=await menuSheet(byId(id).title,[{label:t("edit"),icon:I.pencil,value:"edit"},{label:t("findCover"),icon:I.photo,value:"cover"},...(byId(id).cover?[{label:t("adjustCover"),icon:I.sort,value:"adjust"}]:[]),{label:t("deleteBook"),value:"del",danger:true}]);
-    if(v==="edit")go("edit",{id});if(v==="cover"){const b=byId(id);openCoverSearch(b,async u=>{setCover(b,u);await saveBook(b);render()})}if(v==="adjust"){const b=byId(id);openCoverEditor(b,async T=>{if(T)b.coverT=T;else delete b.coverT;await saveBook(b);render()})}if(v==="del"&&await confirmSheet(t("confirmDelete"),t("delete"),true)){S.books=S.books.filter(b=>b.id!==id);await DB.del(id);back()}break}
+    if(v==="edit")go("edit",{id});if(v==="cover"){const b=byId(id);openCoverSearch(b,async u=>{setCover(b,u);await saveBook(b);render()})}if(v==="adjust"){const b=byId(id);openCoverEditor(b,async(T,sh)=>{applyCoverEdit(b,T,sh);await saveBook(b);render()})}if(v==="del"&&await confirmSheet(t("confirmDelete"),t("delete"),true)){S.books=S.books.filter(b=>b.id!==id);await DB.del(id);back()}break}
   case "setpage":{const b=byId(id);const v=await numberSheet(t("untilPage"),b.progress||0);if(v!==null){b.progress=v;b.lastRead=new Date().toISOString();if(b.status==="toread"||b.status==="wishlist"){b.status="reading";b.start=b.start||new Date().toISOString()}
     if(b.pages&&v>=b.pages&&b.status!=="finished"&&await confirmSheet(t("markFinished"),t("yes"))){b.status="finished";b.end=new Date().toISOString()}await saveBook(b);render();toast(t("progressSaved"))}break}
   case "rate":{const b=byId(id);const n=+el.dataset.n;b.rating=b.rating===n?0:n;await saveBook(b);render();break}
