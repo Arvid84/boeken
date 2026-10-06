@@ -409,8 +409,14 @@ function coverHTML(b,opt){if(typeof opt==="string")opt={cls:opt};opt=opt||{};con
 function bgStyle(b){return b.cover?`style="background-image:url('${esc(b.cover).replace(/'/g,"%27")}')"`:`style="background:linear-gradient(160deg,${PALS[hash(b.title)%PALS.length].join(",")})"`}
 
 /* ---------- navigation ---------- */
-function go(v,p={}){S.stack.push({v,...p});render();window.scrollTo(0,0)}
-function back(){if(S.stack.length>1)S.stack.pop();render()}
+/* every screen remembers its scroll position; going back restores it and makes sure the book you came from is in view */
+function go(v,p={}){cur().scroll=window.scrollY;S.stack.push({v,...p});render();window.scrollTo(0,0)}
+function back(){const from=S.stack.length>1?S.stack.pop():null;render();const c=cur();
+  const restore=()=>{window.scrollTo(0,c.scroll||0);if(!from||!from.id)return;
+    const el=document.querySelector(`#grid [data-id="${from.id}"], .nowcard[data-id="${from.id}"]`);if(!el)return;
+    const r=el.getBoundingClientRect(),top=90,bottom=innerHeight-110;
+    if(r.top<top||r.bottom>bottom)window.scrollTo(0,Math.max(0,window.scrollY+r.top-(innerHeight-r.height)/2))};
+  restore();requestAnimationFrame(restore)}
 function cur(){return S.stack[S.stack.length-1]}
 function setTab(tab){S.tab=tab;S.stack=[{v:tab==="books"?"home":tab}];render();window.scrollTo(0,0)}
 
@@ -532,7 +538,7 @@ function vSettings(){const st=S.settings;
    ${window.SEED_CSV?`<button class="row accent" data-a="seed">${t("loadSeed")}</button>`:""}
    <button class="row" style="color:var(--red)" data-a="deleteall">${t("deleteAll")}</button></div>
   <p class="hint">${t("install")}</p>
-  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.14</p>`}
+  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.15</p>`}
 
 /* ---------- render ---------- */
 function render(){const c=cur();let h="";
