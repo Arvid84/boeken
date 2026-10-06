@@ -528,7 +528,7 @@ function vSettings(){const st=S.settings;
    ${window.SEED_CSV?`<button class="row accent" data-a="seed">${t("loadSeed")}</button>`:""}
    <button class="row" style="color:var(--red)" data-a="deleteall">${t("deleteAll")}</button></div>
   <p class="hint">${t("install")}</p>
-  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.11</p>`}
+  <p class="hint">${S.books.length} ${t("books_n")} · ${t("version")} 0.12</p>`}
 
 /* ---------- render ---------- */
 function render(){const c=cur();let h="";
@@ -902,7 +902,12 @@ document.addEventListener("keydown",e=>{const el=e.target.closest&&e.target.clos
   try{S.session=await DB.get("session")||null;if(S.session&&byId(S.session.bookId))showReader()}catch(e){}
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   setTimeout(()=>fetchMissingCovers(),1500);
-  if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+  if("serviceWorker" in navigator&&location.protocol==="https:"){
+    /* updates: never read sw.js from the HTTP cache, check again whenever the app comes back to the foreground, reload once a new version takes over */
+    const hadController=!!navigator.serviceWorker.controller;let reloading=false;
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!hadController||reloading||S.session)return;reloading=true;location.reload()});
+    navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(reg=>{
+      document.addEventListener("visibilitychange",()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{})}
 })();
 </script>
 
